@@ -1,0 +1,37 @@
+@charset "UTF-8";
+/* CSS Document */
+
+.ggp_section {
+	background: #dde9f9; padding: 10px 15px 1px;
+}
+.ggp_separator {
+	background: #dcdcdc; padding: 8px 15px 9px;
+}
+.ggp_separator p {
+	font-size:12px;
+	margin: 0px 0px 5px 0px;
+}
+.ggp_required {
+	color: #CC0000;
+	font-size: 20px;
+	line-height: 0;
+}
+.ggp_required_txt {
+	color: #CC0000;
+}
+.ggp_optional_txt {
+	color: #02bb04;
+}
+#Payment-Gateway-Config-gofasboletofacil td.fieldlabel {
+	background-color: #fff;
+	text-align: right;
+	vertical-align: text-top;
+}
+#Payment-Gateway-Config-gofasboletofacil td.input-inline {
+	display: inline-block;
+	float: left;
+	clear: left;
+}
+#Payment-Gateway-Config-gofasboletofacil td.fieldarea input {
+	margin-right: 5px;
+}
