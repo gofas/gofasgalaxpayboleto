@@ -19,7 +19,7 @@ function gofasgalaxpayboleto_MetaData(){
 function gofasgalaxpayboleto_config(){
 	if(stripos($_SERVER['REQUEST_URI'], '/configgateways.php')!==false){
 		require_once __DIR__.'/functions.php';
-		$module_version = '0.2.0';
+		$module_version = '0.1.1';
 		$verify_install = ggpb_verify_install();
 		$whmcs_url = ggpb_whmcs_url();
 		$check_updates = ggpb_verify_module_updates('14695',$whmcs_url['url'],$module_version);
