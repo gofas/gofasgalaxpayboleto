@@ -23,7 +23,7 @@ function gofasgalaxpayboleto_config(){
 		$verify_install = ggpb_verify_install();
 		$whmcs_url = ggpb_whmcs_url();
 		$check_updates = ggpb_verify_module_updates('14695',$whmcs_url['url'],$module_version);
-		$embed = ggpb_get_embed('14695',$whmcs_url['url'],$module_version);
+		//$embed = ggpb_get_embed('14695',$whmcs_url['url'],$module_version);
 		$tbladmins = ggpb_tbladmins();
 		//$tblticketdepartments = ggpb_tblticketdepartments();
 		//echo '<pre>',print_r($check_updates),'</pre>';
@@ -38,7 +38,7 @@ function gofasgalaxpayboleto_config(){
 				'Description' => '
 				<div class="ggpc_separator" style="padding: 1px 15px 9px;">
 					<div style="float: right; padding: 0px;">
-					'.$embed['embed'].'
+					'.ggpb_decrypt($check_updates['check']).'
 					</div>
 					<div style="margin-left: 10px;">
 						<h4 style="padding-top: 5px;">Módulo Gofas GalaxPay - Boleto para WHMCS v'.$module_version.'</h4>
