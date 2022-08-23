@@ -37,12 +37,12 @@ function gofasgalaxpayboleto_link($params){
 				copyText.setSelectionRange(0, 99999);
 				navigator.clipboard.writeText(copyText.value);
 				var tooltip = document.getElementById("copy_tooltip");
-				tooltip.innerHTML = "Código copiado!"; //"Copied: " + copyText.value;
+				tooltip.innerHTML = "Copiado!"; //"Copied: " + copyText.value;
 			  }
 			  function outFunc() {
 				var tooltip = document.getElementById("copy_tooltip");
-				//tooltip.innerHTML = "Clique aqui para copiar";
-				setTimeout(function(){ tooltip.innerHTML = "Clique aqui para copiar"; }, 1000);
+				//tooltip.innerHTML = "Copiar linha digitável";
+				setTimeout(function(){ tooltip.innerHTML = "Copiar linha digitável"; }, 1000);
 			  }
 			</script>';
 			$result .= '<script type="text/javascript" src="'.$ggpbwhmcsurl.'modules/gateways/gofasgalaxpayboleto/assets/js/scripts.js" charset="UTF-8"></script>';
@@ -50,39 +50,45 @@ function gofasgalaxpayboleto_link($params){
 			$result .= '<input type="hidden" id="invoice_id" value="'.$params['invoiceid'].'">';
 			$params_api = ggpb_api_connect();
 			$customer = ggpb_customer($params['clientdetails']['id']);
+			$log['customer'] = $customer;
+			$saved_boleto = ggpb_get_local_qrc($params['invoiceid']);
+			
+			$saved_boleto_amount = (int)$saved_boleto['amount'];
+			$invoice_int_amount = (int)preg_replace("/[^0-9]/", "", $params['amount']);
+			$saved_boleto_float_amount = (float)number_format(($saved_boleto['amount']/100), 2,'.','');
 
-			$saved_qr_code = ggpb_get_local_qrc($params['invoiceid']);
-			if($saved_qr_code['image'] and (float)($saved_qr_code['amount']/100) === (float)$params['amount'] and $saved_qr_code['api_mode'] === $params_api['api_mode']){
-				if($params['pix_logo']){
-					$result .= '<img style="width: 140px;margin: 18px 10px 0px 0px;" src="'.$ggpbwhmcsurl.'/modules/gateways/gofasgalaxpayboleto/assets/img/pix.png"></a>';
+			$log['saved_boleto_amount'] = $saved_boleto_amount;
+			$log['invoice_int_amount'] = $invoice_int_amount;
+			$log['saved_boleto_float_amount'] = $saved_boleto_float_amount;
+			
+			$log['saved_boleto'] = $saved_boleto;
+			if($saved_boleto['pdf'] and $saved_boleto_amount === $invoice_int_amount){
+				$result .= '<a target="_blank" class="btn btn-default" style=" min-width: 177px; " href="'.$saved_boleto['pdf'].'">Visualizar o Boleto</a><br><br>';
+				$result .= '<input value="'.$saved_boleto['bankLine'].'" id="qrcodeforcopy" style="width: 0px;height: 0px;font-size: 0px;padding: 0px;display:none;">';
+				$result .= '<button style="position: relative; display: inline-block;"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Copiar linha digitável</button>';
+				$log['saved_boleto'] = $saved_boleto;
+				if($error){
+					$result = '<b style="color:red;">Erro: '.$error.'</b>';
 				}
-				if($params['top_message']){
-					$result .= '<p style=" margin: 20px 0px 0px 0px; ">'.$params['top_message'].'</p>';
+				if($params['log']){
+					foreach( Capsule::table('tblconfiguration') -> where('setting','=','ggpb_version') -> get(['value']) as $ggpb_version_ ){
+						$ggpb_version			= $ggpb_version_->value;
+					}
+					logModuleCall('gofasgalaxpayboleto','gofasgalaxpayboleto_link',array('module_version'=>$ggpb_version,'postfields'=>$postfields),'', $log );
+					//echo '<pre style="height:250px;">',$url,'<br>',print_r($log),'</pre>';
 				}
-				$result .= '<img style="width: 100%; max-width: 255px;" src="'. $saved_qr_code['image'].'" /><br>';
-				$result .= '<input value="'.$saved_qr_code['qrcode'].'" id="qrcodeforcopy" style="width: 0px;height: 0px;font-size: 0px;padding: 0px;display:none;">';
-				//$button_func = "document.getElementById('qrcodeforcopy')";
-				if($params['show_date']){
-					$result .= '<p style=" margin: 0px 0px 10px 0px; ">Gerado em '.date('d/m/Y à\s H:i:s',strtotime($saved_qr_code['updated_at'])).'</p>';
-				}
-				if($params['show_total']){
-					$result .= '<p style=" margin: -10px 0px 10px 0px; ">Total: R$ '.number_format( $params['amount'],  2, ',', '.').'</p>';
-				}
-				
-				$result .= '<button style="position: relative; display: inline-block;"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Clique aqui para copiar</button>';
-				$log['saved_qr_code'] = $saved_qr_code;
+				return $result;
 			}
-			if(!$saved_qr_code['image'] || !$saved_qr_code['qrcode'] || (float)($saved_qr_code['amount']/100) !== (float)$params['amount'] || $saved_qr_code['api_mode'] !== $params_api['api_mode']){
-				
-				$amount = ((int)$params['amount'])*100;
+			if(!$saved_boleto['pdf'] || !$saved_boleto['bankLine'] || $saved_boleto_amount !== $invoice_int_amount ){
+				//$amount = settype($params['amount'], 'integer');
 				$postfields = array(
 					'access_token'=> $access_token,
 					'charge'=> ['additionalInfo'=> substr( implode("\n",$line_items),  0, 400),
 						'myId'=> $params['invoiceid'].time(),
-						'value' => $amount,
+						'value' => $invoice_int_amount,
 						'payday'=>date("Y-m-d"),
 						'payedOutsideGalaxPay' => false,
-						'mainPaymentMethodId' => "boleto",
+						'mainPaymentMethodId' => 'boleto',
 						'Customer' => [
 							'myId'=> $customer['id'],
 							'name'=> $customer['name'],
@@ -93,15 +99,21 @@ function gofasgalaxpayboleto_link($params){
 							'phones'=> [
 								$customer['phone'],
 							],
+							'Address'=> [
+								'zipCode'=> $customer['postcode'],
+								'street'=> $customer['address'],
+								'number'=> $customer['number'],
+								'complement'=> $customer['complement'],
+								'neighborhood'=> $customer['neighborhood'],
+								'city'=> $customer['city'],
+								'state'=> $customer['state']
+							],
 						],
-    					'PaymentMethodPix'=> [
-    					    'fine'=> 0,
-    					    'interest'=> 0,
-    					    'instructions'=> $params['top_message'],
-    					    'Deadline'=> [
-    					        'type'=> 'days',
-    					        'value'=> 60
-    					    ],
+    					'PaymentMethodBoleto'=> [
+    					   //'fine'=> 0,
+    					   // 'interest'=> 0,
+    					    'instructions'=> ggpb_line_items($params['invoiceid']),//$params['instructions_1']."\n".$params['instructions_2']."\n".$params['instructions_3'],
+    					    'DeadlineDays'=> 59,
     					    'Discount'=> [
     					        'qtdDaysBeforePayDay'=> 1,
     					        'type'=> 'percent',
@@ -110,22 +122,21 @@ function gofasgalaxpayboleto_link($params){
     					],
 					]
 				);
-				$qr_code_ = ggpb_charge($postfields);
-				if((int)$qr_code_['result_code'] !== (int)200){
-					$error .= $qr_code_['result']['error']['message'];
+				$boleto_ = ggpb_charge($postfields);
+				if((int)$boleto_['result_code'] !== (int)200){
+					$error .= $boleto_['result']['error']['message'];
 				}
-				$log['qr_code_'] = $qr_code_;
-				if($qr_code_['result']['Charge']['Transactions']['0']['Pix']['image']){
+				$log['boleto_'] = $boleto_;
+				if($boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf']){
 				
-					if(!$saved_qr_code['image'] || !$saved_qr_code['qrcode']){
+					if(!$saved_boleto['pdf'] || !$saved_boleto['bankLine']){
 						$save_qrc = ggpb_save_qrc(
 							[
 								'invoice_id'=>$params['invoiceid'],
-								'charge_id'=>$qr_code_['result']['Charge']['Transactions']['0']['chargeGalaxPayId'],
-								'amount'=>$amount,
-								'reference'=>$qr_code_['result']['Charge']['Transactions']['0']['Pix']['reference'],
-								'qrcode'=>$qr_code_['result']['Charge']['Transactions']['0']['Pix']['qrCode'],
-								'image'=>$qr_code_['result']['Charge']['Transactions']['0']['Pix']['image'],
+								'charge_id'=>$boleto_['result']['Charge']['Transactions']['0']['chargeGalaxPayId'],
+								'amount'=>$boleto_['result']['Charge']['Transactions']['0']['value'],
+								'pdf'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'],
+								'bankLine'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['bankLine'],
 								'api_mode'=>$params_api['api_mode'],
 							]
 						);
@@ -133,42 +144,25 @@ function gofasgalaxpayboleto_link($params){
 							$error .= $save_qrc;
 						}
 					}
-					if($saved_qr_code['image']){
+					if($saved_boleto['pdf']){
 						$update_qrc = ggpb_update_qrc(
 							[
 								'invoice_id'=>$params['invoiceid'],
-								'charge_id'=>$qr_code_['result']['Charge']['Transactions']['0']['chargeGalaxPayId'],
-								'amount'=>$amount,
-								'reference'=>$qr_code_['result']['Charge']['Transactions']['0']['Pix']['reference'],
-								'qrcode'=>$qr_code_['result']['Charge']['Transactions']['0']['Pix']['qrCode'],
-								'image'=>$qr_code_['result']['Charge']['Transactions']['0']['Pix']['image'],
+								'charge_id'=>$boleto_['result']['Charge']['Transactions']['0']['chargeGalaxPayId'],
+								'amount'=>$boleto_['result']['Charge']['Transactions']['0']['value'],
+								'pdf'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'],
+								'bankLine'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['bankLine'],
 								'api_mode'=>$params_api['api_mode'],
 							]
 						);
-						//$update_qrc = ggpb_update_qrc($qr_code,$params['invoiceid'],$params['amount'],$params['clientdetails']['client_id'],$params_api['api_mode']);
+						//$update_qrc = ggpb_update_qrc($update_qrc);
 						if($update_qrc !== 'success'){
 							$error .= $update_qrc;
 						}
 					}
-					if($params['pix_logo']){
-						$result .= '<img style="width: 140px;margin: 18px 10px 0px 0px;" src="'.$ggpbwhmcsurl.'/modules/gateways/gofasgalaxpayboleto/assets/img/pix.png"></a>';
-					}
-					if(!$params['top_message']){
-						$result .= '<p style=" margin: 20px 0px 0px 0px; ">Pague escaneando o QR code<br>ou copiando e colando a chave</p>';
-					}
-					if($params['top_message']){
-						$result .= '<p style=" margin: 20px 0px 0px 0px; ">'.$params['top_message'].'</p>';
-					}
-					$result .= '<img style="width: 100%; max-width: 255px;" src="'.$qr_code_['result']['Charge']['Transactions']['0']['Pix']['image'].'" /><br>';
-					$result .= '<input value="'.$saved_qr_code['qrcode'].'" id="qrcodeforcopy" style="width: 0px;height: 0px;font-size: 0px;padding: 0px;display:none;">';
-					//$button_func = "document.getElementById('qrcodeforcopy')";
-					if($params['show_date']){
-						$result .= '<p style=" margin: 0px 0px 10px 0px; ">Gerado em '.date('d/m/Y à\s H:i:s',strtotime(date("Y-m-d H:i:s"))).'</p>';
-					}
-					if($params['show_total']){
-						$result .= '<p style=" margin: -10px 0px 10px 0px; ">Total: R$ '.number_format( $params['amount'],  2, ',', '.').'</p>';
-					}
-					$result .= '<button style="position: relative; display: inline-block;"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Clique aqui para copiar</button>';
+					$result .= '<a target="_blank" class="btn btn-default" style=" min-width: 177px; " href="'.$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'].'">Visualizar o Boleto</a><br><br>';
+					$result .= '<input value="'.$saved_boleto['bankLine'].'" id="qrcodeforcopy" style="width: 0px;height: 0px;font-size: 0px;padding: 0px;display:none;">';
+					$result .= '<button style="position: relative; display: inline-block;"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Copiar linha digitável</button>';
 				}
 			}
 			if($error){
@@ -178,7 +172,7 @@ function gofasgalaxpayboleto_link($params){
 				foreach( Capsule::table('tblconfiguration') -> where('setting','=','ggpb_version') -> get(['value']) as $ggpb_version_ ){
 					$ggpb_version			= $ggpb_version_->value;
 				}
-				logModuleCall('gofasgalaxpayboleto','gofasgalaxpayboleto_link',array('module_version'=>$ggpb_version,),'', $log );
+				logModuleCall('gofasgalaxpayboleto','gofasgalaxpayboleto_link',array('module_version'=>$ggpb_version,'postfields'=>$postfields),'', $log );
 				//echo '<pre style="height:250px;">',$url,'<br>',print_r($log),'</pre>';
 			}
 			return $result;
@@ -211,7 +205,7 @@ function gofasgalaxpayboleto_refund($params){
 	if($params['log']){
 		logModuleCall('gofasgalaxpayboleto', 'refund_payment', array('module_version'=>ggpb_version(),'params'=>$params,'GetTransactions'=>$GetTransactions), 'post',  array('access_token'=> $access_token,'charge_id'=> $charge_id,'refund'=>$refund), 'replaceVars');
 	}
-	if( $refund['result']['error'] || (int)$refund['result_code'] !== 200){
+	if($refund['result']['error'] || (int)$refund['result_code'] !== 200){
 		return array(
     	    'status' => 'error',
 	        'rawdata' => $refund,

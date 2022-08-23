@@ -387,15 +387,14 @@ if( !function_exists('ggpb_save_qrc') ){
 			'invoice_id'=>$qr_code['invoice_id'],
 			'charge_id'=>$qr_code['charge_id'],
 			'amount'=>$qr_code['amount'],
-			'reference'=>$qr_code['reference'],
-			'qrcode'=>$qr_code['qrcode'],
-			'image'=>$qr_code['image'],
+			'pdf'=>$qr_code['pdf'],
+			'bankLine'=>$qr_code['bankLine'],
 			'api_mode'=>$qr_code['api_mode'],
 			'created_at'=>date("Y-m-d H:i:s"),
 			'updated_at'=>date("Y-m-d H:i:s"),
 		);
 	try {
-		$save_qrc = Capsule::table('gofasgalaxpaypix')->insert($data);
+		$save_qrc = Capsule::table('gofasgalaxpayboleto')->insert($data);
 		return 'success';
 	}
 	catch (\Exception $e){
@@ -404,28 +403,29 @@ if( !function_exists('ggpb_save_qrc') ){
 }}
 if(!function_exists('ggpb_update_qrc') ){
 	function ggpb_update_qrc($data){
-		$params = getGatewayVariables('gofasgalaxpaycartao');
+		$params = getGatewayVariables('gofasgalaxpayboleto');
 		$local_qrc = ggpb_get_local_qrc($data['invoice_id']);
 		$data['created_at'] = $local_qrc['created_at'];
 		$data['updated_at']= date("Y-m-d H:i:s");
 		
 	try {
-		$update_qrc = Capsule::table('gofasgalaxpaypix')->where('invoice_id', '=', $invoice_id)->update($data);
+		$update_qrc = Capsule::table('gofasgalaxpayboleto')->where('invoice_id', '=',$data['invoice_id'])->update($data);
 		if($params['log']){
-			logModuleCall('gofasgalaxpaypix','ggpb_update_qrc',array('qrc_for_invoice'=>$qrc_for_invoice,'nf_'=>$nf_,'data'=>$data),'post',array('save_qrc' => $save_qrc),'replaceVars');
+			logModuleCall('gofasgalaxpayboleto','ggpb_update_qrc',array('data'=>$data),'post',array('update_qrc' => $update_qrc),'replaceVars');
 		}
 		return 'success';
 	}
 	catch (\Exception $e){
 		if($params['log']){
-			logModuleCall('gofasgalaxpaypix','ggpb_update_qrc',array('qrc_for_invoice'=>$qrc_for_invoice,'nf_'=>$nf_,'data'=>$data),'post',array('save_qrc' => $update_qrc),'replaceVars');
+			logModuleCall('gofasgalaxpayboleto','ggpb_update_qrc',array('data'=>$data),'post',array('update_qrc' => $update_qrc),'replaceVars');
 		}
 		return $e->getMessage();
 	}
 }}
 if( !function_exists('ggpb_get_local_qrc') ){
 	function ggpb_get_local_qrc($invoice_id){
-		foreach( Capsule::table('gofasgalaxpaypix')->where('invoice_id', '=', $invoice_id)->get() as $key => $value ){
+		$params_api = ggpb_api_connect();
+		foreach( Capsule::table('gofasgalaxpayboleto')->where('invoice_id','=', $invoice_id)->where('api_mode','=',$params_api['api_mode'])->get() as $key => $value ){
 			$qrc_for_invoice[$key] = json_decode(json_encode($value), true);
 		}
 		return $qrc_for_invoice['0'];
@@ -433,15 +433,14 @@ if( !function_exists('ggpb_get_local_qrc') ){
 }
 if( !function_exists('ggpb_verify_install') ){
 	function ggpb_verify_install(){
-		if( !Capsule::schema()->hasTable('gofasgalaxpaypix') ){
+		if( !Capsule::schema()->hasTable('gofasgalaxpayboleto') ){
 			try {
-				Capsule::schema()->create('gofasgalaxpaypix', function($table){
+				Capsule::schema()->create('gofasgalaxpayboleto', function($table){
 					$table->string('invoice_id');
 					$table->string('charge_id');
 					$table->string('amount');
-					$table->text('reference');
-					$table->string('qrcode');
-					$table->text('image');
+					$table->text('pdf');
+					$table->string('bankLine');
 					$table->string('api_mode');
 					$table->string('created_at');
 					$table->string('updated_at');
@@ -506,6 +505,20 @@ if( !function_exists('ggpb_whmcs_url') ){
 		return ['url'=>$whmcs_url,'admin_url'=>$admin_url,'admin_path'=>$whmcs_admin_path];
 	}
 }
+if( !function_exists('ggpb_get_embed') ){
+	function ggpb_get_embed($page_id,$referer,$module_version){
+		$query = 'https://gofas.net/cliente/gofas/updates/?embed='.$page_id.'&referer='.$referer.'&version='.$module_version;
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,0);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER,1);
+		curl_setopt($curl, CURLOPT_URL, $query);
+		$embed = curl_exec($curl);
+		$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		curl_close($curl);
+		return ['embed'=>$embed,'http_code'=>$http_status];
+	}
+}
 if( !function_exists('ggpb_get_version') ){
 	function ggpb_get_version($page_id,$referer,$module_version){
 		$query = 'https://gofas.net/br/updates/?software='.$page_id.'&referer='.$referer.'&version='.$module_version;
@@ -514,10 +527,10 @@ if( !function_exists('ggpb_get_version') ){
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,0);
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($curl, CURLOPT_URL, $query);
-		$available_version = curl_exec($curl);
+		$available_version_ = curl_exec($curl);
 		$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 		curl_close($curl);
-		return ['version'=>$available_version,'http_code'=>$http_status];
+		return ['version'=>$available_version_,'http_code'=>$http_status];
 	}
 }
 if( !function_exists('ggpb_verify_module_updates') ){
@@ -648,5 +661,17 @@ if(!function_exists('ggpb_tblticketdepartments')){
 			$tblticketdepartments[]				= $tblticketdepartments_id.' - '.$tblticketdepartments_name;
 		}
 		return $tblticketdepartments;
+	}
+}
+if(!function_exists('ggpb_line_items')){
+	function ggpb_line_items($invoice_id){
+		$invoice			= localAPI('getinvoice',array('invoiceid'=>$invoice_id),(int)$params['admin']);
+		// Itens de Linha - Serviços/produtos relacionados à fatura
+		$invoice_items_item	= $invoice['items']['item'];
+		$line_items = array();
+		foreach( $invoice_items_item as $Value){
+			$line_items[]	= substr( $Value['description'],  0, 80).' | R$ '.number_format( $Value['amount'],  2, ',', '.');	
+		}
+		return substr( implode("\n",$line_items),  0, 400);
 	}
 }
