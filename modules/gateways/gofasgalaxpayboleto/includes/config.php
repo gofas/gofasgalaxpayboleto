@@ -49,7 +49,7 @@ function gofasgalaxpayboleto_config(){
 				</div>',
 			),
 			'separator_2' => array(
-				'Description' => '<h2>Credenciais API - Produção</h2>',
+				'Description' => '<h2>Credenciais Live (produção)</h2>',
 			),
 			// Secret Token
 			'galax_id' => array(
@@ -67,10 +67,10 @@ function gofasgalaxpayboleto_config(){
 				'Description' => '<span class="ggpc_required_txt">(Obrigatório)</span> Galax Hash | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/suporte">Obter Galax Hash</a>',
 			),
 			'separator_3' => array(
-				'Description' => '<h2>Credenciais API - Testes</h2>',
+				'Description' => '<h2>Credenciais Sandbox (testes)</h2>',
 			),
 			'sandbox_galax_id' => array(
-				'FriendlyName' => $opt_num++.'- Sandbox Galax ID<span class="ggpc_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax ID<span class="ggpc_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
@@ -78,18 +78,14 @@ function gofasgalaxpayboleto_config(){
 			),
 			// Sandbox Secret Token
 			'sandbox_galax_hash' => array(
-				'FriendlyName' => $opt_num++.'- Sandbox Galax Hash<span class="ggpc_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax Hash<span class="ggpc_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
 				'Description' => '<span class="ggpc_required_txt">(Obrigatório)</span> Galax Hash | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/autenticacao">Obter Galax Hash</a>',
 			),
-			'admin' => array(
-				'FriendlyName' => $opt_num++.'- Administrador do WHMCS<span class="ggp_required">*</span>',
-				'Type'          => 'dropdown',
-				'Default' 		=> key(reset($tbladmins)),
-    	        'Options'       => $tbladmins,
-				'Description' => 'Defina o administrador com permissões para utilizar a API interna do WHMCS.',
+			'separator_3_1' => array(
+				'Description' => '<span></span>',
 			),
 			// Sandbox
 			'sandbox' => array(
@@ -121,34 +117,27 @@ function gofasgalaxpayboleto_config(){
 				'Default' => '0.99',
 				'Description' => 'Insira o valor da tarifa paga à GalaxPay por cada Boleto recebido. Formato: Decimal, separado por ponto (0.99)',
 			),
-			/*////
-			'separator_4' => array(
-				'Description' => '<h2>Instruções do boleto</h2>Caso não informado será utilizado o padrão definido no GalaxPay.',
-			),
-			// Instruction 1
-			'instructions_1' => array(
-				'FriendlyName' => $opt_num++.'- Instrução 1',
+			// Top billet button message 
+			'message' => array(
+				'FriendlyName' => $opt_num++.'- Mensagem na fatura',
 				'Type' => 'text',
 				'Size' => '50',
-				'Default' => '',
-				'Description' => '<span class="ggpc_required_txt">Será acrescentado na 1ª linha das "Instruções" do boleto</a>',
+				'Default' => 'Boleto gerado com sucesso.<br>Acesse o link ou copie a linha digitável.<br>',
+				'Description' => 'Texto exibido na fatura acima do botão "Vizualizar Boleto"',
 			),
-			// Instruction 2
-			'instructions_2' => array(
-				'FriendlyName' => $opt_num++.'- Instrução 2',
-				'Type' => 'text',
-				'Size' => '50',
-				'Default' => '',
-				'Description' => '<span class="ggpc_required_txt">Será acrescentado na 2ª linha das "Instruções" do boleto</a>',
+			// Redirecionar para o link do boleto
+			'redirecttobillet' => array(
+				'FriendlyName' => $opt_num++.'- Redirecionar para o Boleto',
+				'Type' => 'yesno',
+				'Description' => 'Redireciona o cliente diretamente para o URL do boleto ao acessar a fatura.',
 			),
-			// Instruction 3
-			'instructions_3' => array(
-				'FriendlyName' => $opt_num++.'- Instrução 3',
-				'Type' => 'text',
-				'Size' => '50',
-				'Default' => '',
-				'Description' => '<span class="ggpc_required_txt">Será acrescentado na 3ª linha das "Instruções" do boleto</a>',
-			),*/
+			'admin' => array(
+				'FriendlyName' => $opt_num++.'- Administrador do WHMCS<span class="ggp_required">*</span>',
+				'Type'          => 'dropdown',
+				'Default' 		=> key(reset($tbladmins)),
+    	        'Options'       => $tbladmins,
+				'Description' => 'Defina o administrador com permissões para utilizar a API interna do WHMCS.',
+			),
 		);
 		$footer = array('footer' => array(
 				'Description' => '<div class="ggp_section">

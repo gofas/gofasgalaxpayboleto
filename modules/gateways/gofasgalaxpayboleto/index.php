@@ -63,9 +63,10 @@ function gofasgalaxpayboleto_link($params){
 			
 			$log['saved_boleto'] = $saved_boleto;
 			if($saved_boleto['pdf'] and $saved_boleto_amount === $invoice_int_amount){
-				$result .= '<a target="_blank" class="btn btn-default" style=" min-width: 177px; " href="'.$saved_boleto['pdf'].'">Visualizar o Boleto</a><br><br>';
+				$result .= $params['message'];
+				$result .= '<a target="_blank" class="btn btn-default" style=" float: left;font-size: 14px;" href="'.$saved_boleto['pdf'].'">Visualizar o Boleto</a>';
 				$result .= '<input value="'.$saved_boleto['bankLine'].'" id="qrcodeforcopy" style="width: 0px;height: 0px;font-size: 0px;padding: 0px;display:none;">';
-				$result .= '<button style="position: relative; display: inline-block;"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Copiar linha digitável</button>';
+				$result .= '<button style="position: relative;font-size: 14px; display: inline-block;float: right"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Copiar linha digitável</button>';
 				$log['saved_boleto'] = $saved_boleto;
 				if($error){
 					$result = '<b style="color:red;">Erro: '.$error.'</b>';
@@ -77,7 +78,14 @@ function gofasgalaxpayboleto_link($params){
 					logModuleCall('gofasgalaxpayboleto','gofasgalaxpayboleto_link',array('module_version'=>$ggpb_version,'postfields'=>$postfields),'', $log );
 					//echo '<pre style="height:250px;">',$url,'<br>',print_r($log),'</pre>';
 				}
-				return $result;
+				if(!$error and $params['redirecttobillet'] and stripos($_SERVER['REQUEST_URI'], 'viewinvoice') ){
+					header_remove();
+					header("Location: ".$saved_boleto['pdf'],true,303);
+					exit;
+				}
+				else {
+					return $result;
+				}
 			}
 			if(!$saved_boleto['pdf'] || !$saved_boleto['bankLine'] || $saved_boleto_amount !== $invoice_int_amount ){
 				//$amount = settype($params['amount'], 'integer');
@@ -160,9 +168,10 @@ function gofasgalaxpayboleto_link($params){
 							$error .= $update_qrc;
 						}
 					}
-					$result .= '<a target="_blank" class="btn btn-default" style=" min-width: 177px; " href="'.$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'].'">Visualizar o Boleto</a><br><br>';
+					$result .= $params['message'];
+					$result .= '<a target="_blank" class="btn btn-default" style=" float: left;font-size: 14px;" href="'.$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'].'">Visualizar o Boleto</a>';
 					$result .= '<input value="'.$saved_boleto['bankLine'].'" id="qrcodeforcopy" style="width: 0px;height: 0px;font-size: 0px;padding: 0px;display:none;">';
-					$result .= '<button style="position: relative; display: inline-block;"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Copiar linha digitável</button>';
+					$result .= '<button style="position: relative;font-size: 14px; display: inline-block;float: right"  id="copy_tooltip" class="btn btn-default" onclick="copy_tooltip()" onmouseout="outFunc()">Copiar linha digitável</button>';
 				}
 			}
 			if($error){
@@ -175,7 +184,14 @@ function gofasgalaxpayboleto_link($params){
 				logModuleCall('gofasgalaxpayboleto','gofasgalaxpayboleto_link',array('module_version'=>$ggpb_version,'postfields'=>$postfields),'', $log );
 				//echo '<pre style="height:250px;">',$url,'<br>',print_r($log),'</pre>';
 			}
-			return $result;
+			if(!$error and $params['redirecttobillet'] and stripos($_SERVER['REQUEST_URI'], 'viewinvoice') ){
+				header_remove();
+				header("Location: ".$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'],true,303);
+				exit;
+			}
+			else {
+				return $result;
+			}
 		}
 		elseif( $params['amount'] < $params['minimunamount']){
 			$error .= 'O valor mínimo para utilizar esse método de pagamento é '.number_format( $params['minimunamount'] ,  2, ',', '.').'.';
