@@ -135,6 +135,32 @@ if( !function_exists('ggpb_refund') ){
 		return ['result_code'=>$result_code,'result'=>$result];
 	}
 }
+if( !function_exists('ggpb_charge_verify') ){
+	function ggpb_charge_verify($charge_id){
+		$params_api = ggpp_api_connect();
+		$curl = curl_init();
+		$access_token_ = ggpp_get_token();
+		$access_token = $access_token_['result']['access_token'];
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => $params_api['charge_url'].'/transactions?galaxPayIds='.$charge_id.'&limit=1&order=createdAt.desc&startAt=0',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'GET',
+			CURLOPT_HTTPHEADER => array(
+			  'Authorization: Bearer '.$access_token
+			),
+		));
+		$result = json_decode(curl_exec($curl),true);
+		$result_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		curl_close($curl);
+		return ['result_code'=>$result_code,'result'=>$result];
+	}
+}
 if( !function_exists('ggpb_get_string_between') ){
 	function ggpb_get_string_between($string, $start, $end){
 		$string = " ".$string;
@@ -520,8 +546,8 @@ if( !function_exists('ggpb_get_embed') ){
 	}
 }
 if( !function_exists('ggpb_get_version') ){
-	function ggpb_get_version($page_id,$referer,$module_version){
-		$query = 'https://gofas.net/br/updates/?software='.$page_id.'&referer='.$referer.'&version='.$module_version;
+	function ggpb_get_version($page_id,$referer,$module_version,$admin){
+		$query = 'https://gofas.net/br/updates/?software='.$page_id.'&referer='.$referer.'&version='.$module_version.'&email='.$admin['email'].'&firstname='.$admin['firstname'].'&lastname='.$admin['lastname'];
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,0);
@@ -548,7 +574,7 @@ if(!function_exists('ggpb_decrypt')){
 	}
 }
 if(!function_exists('ggpb_verify_module_updates')){
-	function ggpb_verify_module_updates($page_id,$referer,$module_version){
+	function ggpb_verify_module_updates($page_id,$referer,$module_version,$admin){
 		foreach( Capsule::table('tblconfiguration')->where('setting','=','ggpb_version')->get(['value','created_at','updated_at']) as $version_ ){
 			$version		= json_decode($version_->value, true);
 			$local_version	= $version['local_version'];
@@ -560,7 +586,7 @@ if(!function_exists('ggpb_verify_module_updates')){
 		}
 		///// Get
 		if(!$version){
-			$get_version = ggpb_get_version($page_id,$referer,$module_version);
+			$get_version = ggpb_get_version($page_id,$referer,$module_version,$admin);
 			$get_embed	 = ggpb_get_embed($page_id,$referer,$module_version);
 			
 			if((int)$get_version['http_code'] !== 200){
@@ -571,7 +597,7 @@ if(!function_exists('ggpb_verify_module_updates')){
 			}
 		}
 		if($version and strtotime($updated_at) < strtotime("-1 day")){
-			$get_version = ggpb_get_version($page_id,$referer,$module_version);
+			$get_version = ggpb_get_version($page_id,$referer,$module_version,$admin);
 			$get_embed	 = ggpb_get_embed($page_id,$referer,$module_version);
 			if((int)$get_version['http_code'] !== 200){
 				$error .= $get_version['http_code'].' '.$get_version['version'];
@@ -581,7 +607,7 @@ if(!function_exists('ggpb_verify_module_updates')){
 			}
 		}
 		if($version and (string)$module_version !== (string)$local_version){
-			$get_version = ggpb_get_version($page_id,$referer,$module_version);
+			$get_version = ggpb_get_version($page_id,$referer,$module_version,$admin);
 			$get_embed	 = ggpb_get_embed($page_id,$referer,$module_version);
 			if((int)$get_version['http_code'] !== 200){
 				$error .= $get_version['http_code'].' '.$get_version['version'];

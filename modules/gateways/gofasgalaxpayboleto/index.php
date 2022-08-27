@@ -53,9 +53,9 @@ function gofasgalaxpayboleto_link($params){
 			$log['customer'] = $customer;
 			$saved_boleto = ggpb_get_local_qrc($params['invoiceid']);
 			
-			$saved_boleto_amount = (int)$saved_boleto['amount'];
-			$invoice_int_amount = (int)preg_replace("/[^0-9]/", "", $params['amount']);
-			$saved_boleto_float_amount = (float)number_format(($saved_boleto['amount']/100), 2,'.','');
+			$saved_boleto_amount = (int)$saved_boleto['amount']; // 4898
+			$invoice_int_amount = (int)preg_replace("/[^0-9]/", "", $params['amount']); // 4898
+			$saved_boleto_float_amount = (float)number_format(($saved_boleto['amount']/100), 2,'.',''); // 48.98
 
 			$log['saved_boleto_amount'] = $saved_boleto_amount;
 			$log['invoice_int_amount'] = $invoice_int_amount;

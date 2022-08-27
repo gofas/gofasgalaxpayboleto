@@ -18,11 +18,15 @@ function gofasgalaxpayboleto_MetaData(){
 }
 function gofasgalaxpayboleto_config(){
 	if(stripos($_SERVER['REQUEST_URI'], '/configgateways.php')!==false){
+		$module_version = '0.2.1';
+		$currentUser = new \WHMCS\Authentication\CurrentUser;
+		$admin_ = json_decode(json_encode($currentUser->admin()),true);
+		$admin = ['email'=>$admin_['email'],'firstname'=>$admin_['firstname'],'lastname'=>$admin_['lastname']];
+		//echo '<pre>',print_r($admin),'</pre>';
 		require_once __DIR__.'/functions.php';
-		$module_version = '0.1.1';
 		$verify_install = ggpb_verify_install();
 		$whmcs_url = ggpb_whmcs_url();
-		$check_updates = ggpb_verify_module_updates('14695',$whmcs_url['url'],$module_version);
+		$check_updates = ggpb_verify_module_updates('14695',$whmcs_url['url'],$module_version,$admin);
 		//$embed = ggpb_get_embed('14695',$whmcs_url['url'],$module_version);
 		$tbladmins = ggpb_tbladmins();
 		//$tblticketdepartments = ggpb_tblticketdepartments();

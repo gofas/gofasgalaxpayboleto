@@ -17,15 +17,15 @@ add_hook("EmailTplMergeFields",1,"ggpb_qrcode_mergetags_fields");
 if(!function_exists('ggpb_qrcode_mergetags_fields')){
     function ggpb_qrcode_mergetags_fields($vars){
         $ggpb_merge_fields = array();
-	    $ggpb_merge_fields['ggpb_image']		= 'GalaxPay PIX: URL da imagem QR Code ';
-		$ggpb_merge_fields['ggpb_qrcode']		= 'GalaxPay PIX: QR Code para copiar';
+	    $ggpb_merge_fields['ggpb_pdf']		= 'GalaxPay Boleto: URL do boleto em PDF';
+		$ggpb_merge_fields['ggpb_bankLine']	= 'GalaxPay Boleto: Linha digitável do boleto para copiar';
         return $ggpb_merge_fields;
     }
 }
 if(!function_exists('ggpb_qrcode_mergetags')){
     function ggpb_qrcode_mergetags($vars){
         $params = getGatewayVariables('gofasgalaxpayboleto');
-	//$pixonemail					= $params['pixonemail'];
+	//$boletoonemail					= $params['boletoonemail'];
 	
 	// Invoice Created | Invoice Payment Reminder | First Invoice Overdue Notice |  Second Invoice Overdue Notice |  Third Invoice Overdue Notice 
     if(
@@ -41,19 +41,19 @@ if(!function_exists('ggpb_qrcode_mergetags')){
 		
 		if( $invoice['total'] > '0.00' and $invoice['paymentmethod'] === 'gofasgalaxpayboleto'){
 			// Saved Billets
-			$pix_saved = array();
-			foreach( Capsule::table('gofasgalaxpayboleto') -> where('invoice_id', '=', $vars['relid'])->get(['image','qrcode']) as $key => $value ){
-				$pixs_for_invoice[$key] = json_decode(json_encode($value), true);
+			$boleto_saved = array();
+			foreach( Capsule::table('gofasgalaxpayboleto') -> where('invoice_id', '=', $vars['relid'])->get(['pdf','bankLine']) as $key => $value ){
+				$boletos_for_invoice[$key] = json_decode(json_encode($value), true);
 			}
-			$pix_saved = $pixs_for_invoice['0']; // Array
+			$boleto_saved = $boletos_for_invoice['0']; // Array
 
 			// Merge Fields
-			$ggpb_merge_fields['ggpb_image']		= $pix_saved['image'];
-			$ggpb_merge_fields['ggpb_qrcode']		= $pix_saved['qrcode'];			
+			$ggpb_merge_fields['ggpb_pdf']			= $boleto_saved['pdf'];
+			$ggpb_merge_fields['ggpb_bankLine']		= $boleto_saved['bankLine'];			
 
 			// Debug Log
 			if($params['log']){
-				logModuleCall('gofasgalaxpayboleto','email_pix',$vars,'',$invoice);
+				logModuleCall('gofasgalaxpayboleto','email_boleto',$vars,'',$invoice);
 			}
 		}
 		return $ggpb_merge_fields;
@@ -73,24 +73,24 @@ function ggpb_check_status_updates($vars){
 	try {
 		// Add Payment to Invoices
 		$log = array();
-		$pix = array();
+		$boleto = array();
 		$invoices = array();
 		// Unpaid invoices IDs
 		foreach( Capsule::table('tblinvoices') -> where( 'status', '=', 'Unpaid' ) -> where('paymentmethod','=','gofasgalaxpayboleto')->get( array('id','total','userid')) as $tblinvoices){
-			foreach( Capsule::table('gofasgalaxpayboleto') -> where( 'invoice_id', '=', $tblinvoices->id )-> get( array( 'charge_id' ) ) as $local_pix ) {
-				$pix = ggpb_charge_verify($local_pix->charge_id);
-				$pixs[$local_pix->charge_id] = $pix;
-				if((int)$pix['result_code'] !== 200){
-					$error	.= 'Erro ao verificar Boleto: ' . json_encode($pix);
+			foreach( Capsule::table('gofasgalaxpayboleto') -> where( 'invoice_id', '=', $tblinvoices->id )-> get( array( 'charge_id' ) ) as $local_boleto ) {
+				$boleto = ggpb_charge_verify($local_boleto->charge_id);
+				$boletos[$local_boleto->charge_id] = $boleto;
+				if((int)$boleto['result_code'] !== 200){
+					$error	.= 'Erro ao verificar Boleto: ' . json_encode($boleto);
 				}
-				if($pix['result']['Transactions']['0']['status'] === 'payedBoleto' || $pix['result']['Transactions']['0']['status'] === 'captured') {
+				if($boleto['result']['Transactions']['0']['status'] === 'payedBoleto' || $boleto['result']['Transactions']['0']['status'] === 'captured') {
 					$invoices[$tblinvoices->id] = [
 						'invoice_id'=>$tblinvoices->id,
-						'trans_id'=>$local_pix->charge_id,
-						'transaction_id'=>$local_pix->id,
+						'trans_id'=>$local_boleto->charge_id,
+						'transaction_id'=>$local_boleto->id,
 						'total'=>$tblinvoices->total,
 						'user_id'=>$tblinvoices->userid,
-						'paid_amount'=> (float)number_format(($pix['result']['Transactions']['0']['value']/100), 2,'.',''), //(float)($pix['result']['Transactions']['0']['value']/100)
+						'paid_amount'=>(float)number_format(($boleto['result']['Transactions']['0']['value']/100), 2,'.',''),
 					];
 				}
 			} // End Foreach
@@ -101,17 +101,17 @@ function ggpb_check_status_updates($vars){
 				$log['invoice_value'][$value['invoice_id']] = $value;
 				$log['invoice_id'][$value['invoice_id']] = $value['invoice_id'];
 				if ( (float)$value['paid_amount'] > (float)$value['total'] ) {
-					$update_invoice = localAPI('updateinvoice', array( 'invoiceid' => $value['invoice_id'], 'newitemdescription' => array('Acréscimos calculados na emissão do QR Code'),'newitemamount' => array((float)($value['paid_amount'] - $value['total']))), $params['admin'] );
+					$update_invoice = localAPI('updateinvoice', array( 'invoiceid' => $value['invoice_id'], 'newitemdescription' => array('Acréscimos calculados na emissão do Boleto'),'newitemamount' => array((float)($value['paid_amount'] - $value['total']))), $params['admin'] );
 				}
 				// - Billet amount is less than the invoice amount
 				if ( (float)$value['paid_amount'] < (float)$value['total'] ) {
-					$update_invoice = localAPI('updateinvoice', array( 'invoiceid' => $value['invoice_id'], 'newitemdescription' => array('Descontos calculados na emissão do QR Code'),'newitemamount' => array((float)($value['paid_amount'] - $value['total']))), $params['admin'] );
+					$update_invoice = localAPI('updateinvoice', array( 'invoiceid' => $value['invoice_id'], 'newitemdescription' => array('Descontos calculados na emissão do Boleto'),'newitemamount' => array((float)($value['paid_amount'] - $value['total']))), $params['admin'] );
 				}
 				$add_trans = localAPI( 'addtransaction' ,
 					[
 						'userid'=>$value['user_id'],
 						'invoiceid'=>$value['invoice_id'],
-						'description'=>'Pago via Pix',
+						'description'=>'Pago via Boleto',
 						'amountin'=>$value['paid_amount'],
 						'fees'=>$params['fee'],
 						'paymentmethod'=>'gofasgalaxpayboleto',
@@ -125,10 +125,10 @@ function ggpb_check_status_updates($vars){
 		}
 	}
 	catch (Exception $e) {
-		$error	.= 'Erro ao listar pix pagos: ' . $e->getMessage();
+		$error	.= 'Erro ao listar boletos pagos: ' . $e->getMessage();
 		$log['error'] = $error;
 	}
-	$log['pixs'] = $pixs;
+	$log['boletos'] = $boletos;
 	$log['invoices'] = $invoices;
 	$log['update_invoice'] = $update_invoice;
 	$log['add_trans'] = $add_trans;
