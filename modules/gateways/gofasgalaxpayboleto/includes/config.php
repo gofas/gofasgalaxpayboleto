@@ -18,15 +18,12 @@ function gofasgalaxpayboleto_MetaData(){
 }
 function gofasgalaxpayboleto_config(){
 	if(stripos($_SERVER['REQUEST_URI'], '/configgateways.php')!==false){
-		$module_version = '0.2.1';
-		$currentUser = new \WHMCS\Authentication\CurrentUser;
-		$admin_ = json_decode(json_encode($currentUser->admin()),true);
-		$admin = ['email'=>$admin_['email'],'firstname'=>$admin_['firstname'],'lastname'=>$admin_['lastname']];
-		//echo '<pre>',print_r($admin),'</pre>';
+		$module_version	= '1.0.0';
+		$module_page	= '14695';
 		require_once __DIR__.'/functions.php';
 		$verify_install = ggpb_verify_install();
 		$whmcs_url = ggpb_whmcs_url();
-		$check_updates = ggpb_verify_module_updates('14695',$whmcs_url['url'],$module_version,$admin);
+		$check_updates = ggpb_verify_module_updates($module_page,$whmcs_url['url'],$module_version);
 		//$embed = ggpb_get_embed('14695',$whmcs_url['url'],$module_version);
 		$tbladmins = ggpb_tbladmins();
 		//$tblticketdepartments = ggpb_tblticketdepartments();
@@ -111,7 +108,7 @@ function gofasgalaxpayboleto_config(){
 				'Type' => 'text',
 				'Size' => '10',
 				'Default' => '5',
-				'Description' => 'Insira o valor total mínimo da fatura para permitir pagamento via Cartão. Formato: Decimal, separado por ponto. Maior ou igual a sua tarifa (a partir de 2.50) e menor ou igual a 1000000.00.',
+				'Description' => 'Insira o valor total mínimo da fatura para permitir pagamento via Boleto. Formato: Decimal, separado por ponto. Maior ou igual a sua tarifa (a partir de 2.50) e menor ou igual a 1000000.00.',
 			),
 			// fee
 			'fee' => array(

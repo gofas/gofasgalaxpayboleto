@@ -545,20 +545,6 @@ if( !function_exists('ggpb_get_embed') ){
 		return ['embed'=>$embed,'http_code'=>$http_status];
 	}
 }
-if( !function_exists('ggpb_get_version') ){
-	function ggpb_get_version($page_id,$referer,$module_version,$admin){
-		$query = 'https://gofas.net/br/updates/?software='.$page_id.'&referer='.$referer.'&version='.$module_version.'&email='.$admin['email'].'&firstname='.$admin['firstname'].'&lastname='.$admin['lastname'];
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,0);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER,1);
-		curl_setopt($curl, CURLOPT_URL, $query);
-		$available_version_ = curl_exec($curl);
-		$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		curl_close($curl);
-		return ['version'=>$available_version_,'http_code'=>$http_status];
-	}
-}
 if(!function_exists('ggpb_encrypt')){
 	function ggpb_encrypt($q) {
 	    $encryptionMethod = "AES-256-CBC";
@@ -573,8 +559,40 @@ if(!function_exists('ggpb_decrypt')){
 	    return openssl_decrypt($q, $encryptionMethod, $secretHash);
 	}
 }
+if( !function_exists('ggpb_get_version') ){
+	function ggpb_get_version($page_id,$referer,$module_version){
+		$currentUser = new \WHMCS\Authentication\CurrentUser;
+		$admin_ = json_decode(json_encode($currentUser->admin()),true);
+		$admin = ['email'=>$admin_['email'],'firstname'=>$admin_['firstname'],'lastname'=>$admin_['lastname']];
+		$query = 'https://gofas.net/br/updates/?software='.$page_id.'&referer='.$referer.'&version='.$module_version.'&email='.$admin['email'].'&firstname='.$admin['firstname'].'&lastname='.$admin['lastname'].ggpb_sysinfo();
+		$curl = curl_init();
+		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,0);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER,1);
+		curl_setopt($curl, CURLOPT_URL, $query);
+		$available_version_ = curl_exec($curl);
+		$http_status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+		curl_close($curl);
+		return ['version'=>$available_version_,'http_code'=>$http_status];
+	}
+}
+if(!function_exists('ggpb_sysinfo')){
+	function ggpb_sysinfo(){
+		foreach( Capsule::table('tblconfiguration')
+		->where('setting','=','Version')
+		->get(['value']) as $data1 ){
+			$Version = $data1->value;
+		}
+		foreach( Capsule::table('tblconfiguration')
+		->where('setting','=','CronPHPVersion')
+		->get(['value']) as $data1 ){
+			$PHPVersion = $data1->value;
+		}
+		return '&whmcs_version='.$Version.'&php_version='.$PHPVersion;
+	}
+}
 if(!function_exists('ggpb_verify_module_updates')){
-	function ggpb_verify_module_updates($page_id,$referer,$module_version,$admin){
+	function ggpb_verify_module_updates($page_id,$referer,$module_version){
 		foreach( Capsule::table('tblconfiguration')->where('setting','=','ggpb_version')->get(['value','created_at','updated_at']) as $version_ ){
 			$version		= json_decode($version_->value, true);
 			$local_version	= $version['local_version'];
@@ -597,7 +615,7 @@ if(!function_exists('ggpb_verify_module_updates')){
 			}
 		}
 		if($version and strtotime($updated_at) < strtotime("-1 day")){
-			$get_version = ggpb_get_version($page_id,$referer,$module_version,$admin);
+			$get_version = ggpb_get_version($page_id,$referer,$module_version);
 			$get_embed	 = ggpb_get_embed($page_id,$referer,$module_version);
 			if((int)$get_version['http_code'] !== 200){
 				$error .= $get_version['http_code'].' '.$get_version['version'];
