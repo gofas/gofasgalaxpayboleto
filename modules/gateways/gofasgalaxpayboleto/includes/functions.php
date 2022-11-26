@@ -5,27 +5,13 @@
  * @see			https://gofas.net/?p=14695
  * @license		https://gofas.net/?p=9340
  * @support		https://gofas.net/?p=14687
- * @version		0.1.0
+ * @version		1.0.1
  */
 require_once __DIR__ . '/../../../../init.php';
 require_once __DIR__ . '/../../../../includes/gatewayfunctions.php';
 require_once __DIR__ . '/../../../../includes/invoicefunctions.php';
 if(!defined("WHMCS")){die();}
 use WHMCS\Database\Capsule;
-if(!function_exists('ggpb_version')){
-	function ggpb_version($int=false){
-		foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'ggpb_version') -> get( array( 'value','created_at') ) as $ggpb_version_ ){
-			$ggpb_version				= $ggpb_version_->value;
-			$ggpb_version_created_at	= $ggpb_version_->created_at;
-		}
-		if(!$int){
-			return $ggpb_version;
-		}
-		if($int){
-			return (int)preg_replace("/[^0-9]/", "", $ggpb_version);
-		}
-	}
-}
 if(!function_exists('ggpb_api_connect')){
 	function ggpb_api_connect(){
 		$params = getGatewayVariables('gofasgalaxpayboleto');
