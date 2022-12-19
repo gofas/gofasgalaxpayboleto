@@ -37,7 +37,7 @@ function gofasgalaxpayboleto_config(){
 			),
 			'separator_1' => array(
 				'Description' => '
-				<div class="ggpc_separator" style="padding: 1px 15px 9px;">
+				<div class="ggpb_separator" style="padding: 1px 15px 9px;">
 					<div style="float: right; padding: 0px;">
 					'.ggpb_decrypt($check_updates['check']).'
 					</div>
@@ -54,36 +54,36 @@ function gofasgalaxpayboleto_config(){
 			),
 			// Secret Token
 			'galax_id' => array(
-				'FriendlyName' => $opt_num++.'- Galax ID<span class="ggpc_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax ID<span class="ggpb_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpc_required_txt">(Obrigatório)</span> Galax ID | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/suporte">Obter Galax ID</a>',
+				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax ID | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/suporte">Obter Galax ID</a>',
 			),
 			'galax_hash' => array(
-				'FriendlyName' => $opt_num++.'- Galax Hash<span class="ggpc_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax Hash<span class="ggpb_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpc_required_txt">(Obrigatório)</span> Galax Hash | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/suporte">Obter Galax Hash</a>',
+				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax Hash | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/suporte">Obter Galax Hash</a>',
 			),
 			'separator_3' => array(
 				'Description' => '<h2>Credenciais Sandbox (testes)</h2>',
 			),
 			'sandbox_galax_id' => array(
-				'FriendlyName' => $opt_num++.'- Galax ID<span class="ggpc_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax ID<span class="ggpb_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpc_required_txt">(Obrigatório)</span> Galax ID | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/autenticacao">Obter Galax ID</a>',
+				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax ID | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/autenticacao">Obter Galax ID</a>',
 			),
 			// Sandbox Secret Token
 			'sandbox_galax_hash' => array(
-				'FriendlyName' => $opt_num++.'- Galax Hash<span class="ggpc_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax Hash<span class="ggpb_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpc_required_txt">(Obrigatório)</span> Galax Hash | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/autenticacao">Obter Galax Hash</a>',
+				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax Hash | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/autenticacao">Obter Galax Hash</a>',
 			),
 			'separator_3_1' => array(
 				'Description' => '<span></span>',
@@ -135,7 +135,7 @@ function gofasgalaxpayboleto_config(){
 			'admin' => array(
 				'FriendlyName' => $opt_num++.'- Administrador do WHMCS<span class="ggp_required">*</span>',
 				'Type'          => 'dropdown',
-				'Default' 		=> key(reset($tbladmins)),
+				'Default' 		=> array_shift(array_values($tbladmins)),
     	        'Options'       => $tbladmins,
 				'Description' => 'Defina o administrador com permissões para utilizar a API interna do WHMCS.',
 			),

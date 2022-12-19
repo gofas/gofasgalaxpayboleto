@@ -123,9 +123,9 @@ if( !function_exists('ggpb_refund') ){
 }
 if( !function_exists('ggpb_charge_verify') ){
 	function ggpb_charge_verify($charge_id){
-		$params_api = ggpp_api_connect();
+		$params_api = ggpb_api_connect();
 		$curl = curl_init();
-		$access_token_ = ggpp_get_token();
+		$access_token_ = ggpb_get_token();
 		$access_token = $access_token_['result']['access_token'];
 
 		curl_setopt_array($curl, array(

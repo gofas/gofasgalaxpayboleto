@@ -88,7 +88,10 @@ function gofasgalaxpayboleto_link($params){
 				}
 			}
 			if(!$saved_boleto['pdf'] || !$saved_boleto['bankLine'] || $saved_boleto_amount !== $invoice_int_amount ){
-				//$amount = settype($params['amount'], 'integer');
+				$line_items = array();
+				foreach( $GetInvoiceResults['items']['item'] as $Value){
+					$line_items[]	= substr( $Value['description'],  0, 80).' | R$ '.number_format( $Value['amount'],  2, ',', '.');	
+				}
 				$postfields = array(
 					'access_token'=> $access_token,
 					'charge'=> ['additionalInfo'=> substr( implode("\n",$line_items),  0, 400),
