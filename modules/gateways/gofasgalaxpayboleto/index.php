@@ -1,8 +1,8 @@
 <?php
 /**
- * Módulo iugu Boleto para WHMCS
+ * Módulo GalaxPay Boleto para WHMCS
  * @copyright	2022 Gofas Software
- * @see			https://gofas.net/?p=14942
+ * @see			https://gofas.net/?p=14695
  * @license		https://gofas.net/?p=9340
  * @support		https://gofas.net/?p=14687
  * @version		0.1.0
@@ -12,12 +12,12 @@ use WHMCS\Database\Capsule;
 //require __DIR__.'/includes/cron.php';
 //require __DIR__.'/includes/hooks.php';
 require_once __DIR__.'/includes/config.php';
-function gofasiuguboleto_link($params){
+function gofasgalaxpayboleto_link($params){
 	if(stripos($_SERVER['REQUEST_URI'], 'viewinvoice.php') !== false ){
 		require __DIR__.'/includes/functions.php';
 		$log['params'] = $params;
 		if($params['amount'] >= $params['minimunamount']){
-			$access_token_ = gib_get_token();
+			$access_token_ = ggpb_get_token();
 			$access_token = $access_token_['result']['access_token'];
 			if($access_token_['result']['access_token']){
 				 $access_token = $access_token_['result']['access_token'];
@@ -27,8 +27,8 @@ function gofasiuguboleto_link($params){
 			}
 			$log['access_token_'] = $access_token_;
 				
-			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'gibwhmcsurl') -> get( array( 'value','created_at') ) as $gibwhmcsurl_ ){
-				$gibwhmcsurl					= $gibwhmcsurl_->value;
+			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'ggpbwhmcsurl') -> get( array( 'value','created_at') ) as $ggpbwhmcsurl_ ){
+				$ggpbwhmcsurl					= $ggpbwhmcsurl_->value;
 			}
 			$result .= '<script>
 			function copy_tooltip() {
@@ -45,13 +45,13 @@ function gofasiuguboleto_link($params){
 				setTimeout(function(){ tooltip.innerHTML = "Copiar linha digitável"; }, 1000);
 			  }
 			</script>';
-			$result .= '<script type="text/javascript" src="'.$gibwhmcsurl.'modules/gateways/gofasiuguboleto/assets/js/scripts.js" charset="UTF-8"></script>';
-			$result .= '<input type="hidden" id="system_url" value="'.$gibwhmcsurl.'">';
+			$result .= '<script type="text/javascript" src="'.$ggpbwhmcsurl.'modules/gateways/gofasgalaxpayboleto/assets/js/scripts.js" charset="UTF-8"></script>';
+			$result .= '<input type="hidden" id="system_url" value="'.$ggpbwhmcsurl.'">';
 			$result .= '<input type="hidden" id="invoice_id" value="'.$params['invoiceid'].'">';
-			$params_api = gib_api_connect();
-			$customer = gib_customer($params['clientdetails']['id']);
+			$params_api = ggpb_api_connect();
+			$customer = ggpb_customer($params['clientdetails']['id']);
 			$log['customer'] = $customer;
-			$saved_boleto = gib_get_local_qrc($params['invoiceid']);
+			$saved_boleto = ggpb_get_local_qrc($params['invoiceid']);
 			
 			$saved_boleto_amount = (int)$saved_boleto['amount']; // 4898
 			$invoice_int_amount = (int)preg_replace("/[^0-9]/", "", $params['amount']); // 4898
@@ -72,10 +72,10 @@ function gofasiuguboleto_link($params){
 					$result = '<b style="color:red;">Erro: '.$error.'</b>';
 				}
 				if($params['log']){
-					foreach( Capsule::table('tblconfiguration') -> where('setting','=','gib_version') -> get(['value']) as $gib_version_ ){
-						$gib_version			= $gib_version_->value;
+					foreach( Capsule::table('tblconfiguration') -> where('setting','=','ggpb_version') -> get(['value']) as $ggpb_version_ ){
+						$ggpb_version			= $ggpb_version_->value;
 					}
-					logModuleCall('gofasiuguboleto','gofasiuguboleto_link',array('module_version'=>$gib_version,'postfields'=>$postfields),'', $log );
+					logModuleCall('gofasgalaxpayboleto','gofasgalaxpayboleto_link',array('module_version'=>$ggpb_version,'postfields'=>$postfields),'', $log );
 					//echo '<pre style="height:250px;">',$url,'<br>',print_r($log),'</pre>';
 				}
 				if(!$error and $params['redirecttobillet'] and stripos($_SERVER['REQUEST_URI'], 'viewinvoice') ){
@@ -98,7 +98,7 @@ function gofasiuguboleto_link($params){
 						'myId'=> $params['invoiceid'].time(),
 						'value' => $invoice_int_amount,
 						'payday'=>date("Y-m-d"),
-						'payedOutsideiugu' => false,
+						'payedOutsideGalaxPay' => false,
 						'mainPaymentMethodId' => 'boleto',
 						'Customer' => [
 							'myId'=> $customer['id'],
@@ -123,7 +123,7 @@ function gofasiuguboleto_link($params){
     					'PaymentMethodBoleto'=> [
     					   //'fine'=> 0,
     					   // 'interest'=> 0,
-    					    'instructions'=> gib_line_items($params['invoiceid']),//$params['instructions_1']."\n".$params['instructions_2']."\n".$params['instructions_3'],
+    					    'instructions'=> ggpb_line_items($params['invoiceid']),//$params['instructions_1']."\n".$params['instructions_2']."\n".$params['instructions_3'],
     					    'DeadlineDays'=> 59,
     					    'Discount'=> [
     					        'qtdDaysBeforePayDay'=> 1,
@@ -133,7 +133,7 @@ function gofasiuguboleto_link($params){
     					],
 					]
 				);
-				$boleto_ = gib_charge($postfields);
+				$boleto_ = ggpb_charge($postfields);
 				if((int)$boleto_['result_code'] !== (int)200){
 					$error .= $boleto_['result']['error']['message'];
 				}
@@ -141,10 +141,10 @@ function gofasiuguboleto_link($params){
 				if($boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf']){
 				
 					if(!$saved_boleto['pdf'] || !$saved_boleto['bankLine']){
-						$save_qrc = gib_save_qrc(
+						$save_qrc = ggpb_save_qrc(
 							[
 								'invoice_id'=>$params['invoiceid'],
-								'charge_id'=>$boleto_['result']['Charge']['Transactions']['0']['chargeiuguId'],
+								'charge_id'=>$boleto_['result']['Charge']['Transactions']['0']['chargeGalaxPayId'],
 								'amount'=>$boleto_['result']['Charge']['Transactions']['0']['value'],
 								'pdf'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'],
 								'bankLine'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['bankLine'],
@@ -156,17 +156,17 @@ function gofasiuguboleto_link($params){
 						}
 					}
 					if($saved_boleto['pdf']){
-						$update_qrc = gib_update_qrc(
+						$update_qrc = ggpb_update_qrc(
 							[
 								'invoice_id'=>$params['invoiceid'],
-								'charge_id'=>$boleto_['result']['Charge']['Transactions']['0']['chargeiuguId'],
+								'charge_id'=>$boleto_['result']['Charge']['Transactions']['0']['chargeGalaxPayId'],
 								'amount'=>$boleto_['result']['Charge']['Transactions']['0']['value'],
 								'pdf'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['pdf'],
 								'bankLine'=>$boleto_['result']['Charge']['Transactions']['0']['Boleto']['bankLine'],
 								'api_mode'=>$params_api['api_mode'],
 							]
 						);
-						//$update_qrc = gib_update_qrc($update_qrc);
+						//$update_qrc = ggpb_update_qrc($update_qrc);
 						if($update_qrc !== 'success'){
 							$error .= $update_qrc;
 						}
@@ -181,10 +181,10 @@ function gofasiuguboleto_link($params){
 		    	$result = '<b style="color:red;">Erro: '.$error.'</b>';
 			}
 			if($params['log']){
-				foreach( Capsule::table('tblconfiguration') -> where('setting','=','gib_version') -> get(['value']) as $gib_version_ ){
-					$gib_version			= $gib_version_->value;
+				foreach( Capsule::table('tblconfiguration') -> where('setting','=','ggpb_version') -> get(['value']) as $ggpb_version_ ){
+					$ggpb_version			= $ggpb_version_->value;
 				}
-				logModuleCall('gofasiuguboleto','gofasiuguboleto_link',array('module_version'=>$gib_version,'postfields'=>$postfields),'', $log );
+				logModuleCall('gofasgalaxpayboleto','gofasgalaxpayboleto_link',array('module_version'=>$ggpb_version,'postfields'=>$postfields),'', $log );
 				//echo '<pre style="height:250px;">',$url,'<br>',print_r($log),'</pre>';
 			}
 			if(!$error and $params['redirecttobillet'] and stripos($_SERVER['REQUEST_URI'], 'viewinvoice') ){
@@ -203,13 +203,13 @@ function gofasiuguboleto_link($params){
 	}
 }
 
-function gofasiuguboleto_refund($params){
+function gofasgalaxpayboleto_refund($params){
 	require_once __DIR__.'/includes/functions.php';
-	$params_api = gib_api_connect();
-	$access_token_ = gib_get_token();
+	$params_api = ggpb_api_connect();
+	$access_token_ = ggpb_get_token();
 	$access_token = $access_token_['result']['access_token'];
-	$charge_id = gib_get_string_between($params['transid'], 'gib-', '-'.$params_api['api_mode']);
-	$refund = gib_refund($charge_id);
+	$charge_id = ggpb_get_string_between($params['transid'], 'ggpb-', '-'.$params_api['api_mode']);
+	$refund = ggpb_refund($charge_id);
 
 	$GetTransactions = localAPI('GetTransactions',array('transid' => $params['transid']), (int)$params['admin']);
 	$dt = new DateTime($GetTransactions['transactions']['transaction']['0']['date']);
@@ -222,7 +222,7 @@ function gofasiuguboleto_refund($params){
 		$fee = NULL;
 	}
 	if($params['log']){
-		logModuleCall('gofasiuguboleto', 'refund_payment', array('module_version'=>gib_version(),'params'=>$params,'GetTransactions'=>$GetTransactions), 'post',  array('access_token'=> $access_token,'charge_id'=> $charge_id,'refund'=>$refund), 'replaceVars');
+		logModuleCall('gofasgalaxpayboleto', 'refund_payment', array('module_version'=>ggpb_version(),'params'=>$params,'GetTransactions'=>$GetTransactions), 'post',  array('access_token'=> $access_token,'charge_id'=> $charge_id,'refund'=>$refund), 'replaceVars');
 	}
 	if($refund['result']['error'] || (int)$refund['result_code'] !== 200){
 		return array(
@@ -234,7 +234,7 @@ function gofasiuguboleto_refund($params){
 	    return array(
         	'status' => 'success',
         	'rawdata' => $refund,
-        	'gib-'.$charge['result']['Charge']['galaxPayId'].'-'.$params_api['api_mode'].'-'.$charge_id.'.',
+        	'ggpb-'.$charge['result']['Charge']['galaxPayId'].'-'.$params_api['api_mode'].'-'.$charge_id.'.',
 			'fee' => $fee,
     	);
 	}
