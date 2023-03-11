@@ -1,18 +1,18 @@
 {
   "schema": "1.0",
   "type": "whmcs-gateways",
-  "name": "gofasgalaxpayboleto",
+  "name": "gofasiuguboleto",
   "license": "proprietary",
   "category": "payments",
   "description": {
-    "name": "Gofas GalaxPay Boleto",
+    "name": "Gofas iugu boleto",
     "tagline": "Solução completa e segura para emissão e recebimentos de boleto bancário via WHMCS."
   },
   "logo": {
     "filename": "/assets/img/logo.png"
   },
   "support": {
-    "docs_url": "https:\/\/gofas.net\/ggpb"
+    "docs_url": "https:\/\/gofas.net\/ggib"
   },
   "authors": [
     {

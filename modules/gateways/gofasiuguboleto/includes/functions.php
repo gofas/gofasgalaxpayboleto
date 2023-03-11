@@ -1,8 +1,8 @@
 <?php
 /**
- * Módulo GalaxPay Boleto para WHMCS
+ * Módulo iugu Boleto para WHMCS
  * @copyright	2022 Gofas Software
- * @see			https://gofas.net/?p=14695
+ * @see			https://gofas.net/?p=14942
  * @license		https://gofas.net/?p=9340
  * @support		https://gofas.net/?p=14687
  * @version		1.0.1
@@ -12,16 +12,16 @@ require_once __DIR__ . '/../../../../includes/gatewayfunctions.php';
 require_once __DIR__ . '/../../../../includes/invoicefunctions.php';
 if(!defined("WHMCS")){die();}
 use WHMCS\Database\Capsule;
-if(!function_exists('ggpb_api_connect')){
-	function ggpb_api_connect(){
-		$params = getGatewayVariables('gofasgalaxpayboleto');
+if(!function_exists('gib_api_connect')){
+	function gib_api_connect(){
+		$params = getGatewayVariables('gofasiuguboleto');
 		if($params['sandbox']){
 			$params_api = [
 				'api_mode' => 'sandbox',
 				'galax_id' => $params['sandbox_galax_id'],
 				'galax_hash' => $params['sandbox_galax_hash'],
 				'public_token' => $params['sandbox_public_token'],
-				'charge_url' => 'https://api.sandbox.cloud.galaxpay.com.br/v2',
+				'charge_url' => 'https://api.sandbox.cloud.iugu.com.br/v2',
 				'galaxIdPartner' => '5473',
 				'galaxHashPartner' => '83Mw5u8988Qj6fZqS4Z8K7LzOo1j28S706R0BeFe',
 			];
@@ -32,7 +32,7 @@ if(!function_exists('ggpb_api_connect')){
 				'galax_id' => $params['galax_id'],									// $params_api['galax_id']
 				'galax_hash' => $params['galax_hash'],								// $params_api['galax_hash']
 				'public_token' => $params['public_token'],							// $params_api['public_token']
-				'charge_url' => 'https://api.galaxpay.com.br/v2',					// $params_api['charge_url']												// $params_api['sandbox']
+				'charge_url' => 'https://api.iugu.com.br/v2',					// $params_api['charge_url']												// $params_api['sandbox']
 				'galaxIdPartner' => '29009',										// $params_api['galaxIdPartner']
 				'galaxHashPartner' => 'U9F6YvKgI77gVqJ60kHk6qOd04RhLfN0YyJ8AfA6',	// $params_api['galaxHashPartner']
 			];
@@ -40,9 +40,9 @@ if(!function_exists('ggpb_api_connect')){
 		return $params_api;
 	}
 }
-if( !function_exists('ggpb_get_token') ){
-	function ggpb_get_token(){
-		$params_api = ggpb_api_connect();
+if( !function_exists('gib_get_token') ){
+	function gib_get_token(){
+		$params_api = gib_api_connect();
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => $params_api['charge_url'].'/token',
@@ -69,9 +69,9 @@ if( !function_exists('ggpb_get_token') ){
 		return ['result_code'=>$result_code,'result'=>$result];
 	}
 }
-if( !function_exists('ggpb_charge') ){
-	function ggpb_charge($postfields){
-		$params_api = ggpb_api_connect();
+if( !function_exists('gib_charge') ){
+	function gib_charge($postfields){
+		$params_api = gib_api_connect();
     	$curl = curl_init();
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => $params_api['charge_url'].'/charges',
@@ -95,9 +95,9 @@ if( !function_exists('ggpb_charge') ){
 		return ['result_code'=>$result_code,'result'=>$result];
 	}
 }
-if( !function_exists('ggpb_refund') ){
-	function ggpb_refund($charge_id,$access_token){
-		$params_api = ggpb_api_connect();
+if( !function_exists('gib_refund') ){
+	function gib_refund($charge_id,$access_token){
+		$params_api = gib_api_connect();
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
 			CURLOPT_URL => $params_api['charge_url'].'/charges/'.$charge_id.'/galaxPayId/reverse',
@@ -121,11 +121,11 @@ if( !function_exists('ggpb_refund') ){
 		return ['result_code'=>$result_code,'result'=>$result];
 	}
 }
-if( !function_exists('ggpb_charge_verify') ){
-	function ggpb_charge_verify($charge_id){
-		$params_api = ggpb_api_connect();
+if( !function_exists('gib_charge_verify') ){
+	function gib_charge_verify($charge_id){
+		$params_api = gib_api_connect();
 		$curl = curl_init();
-		$access_token_ = ggpb_get_token();
+		$access_token_ = gib_get_token();
 		$access_token = $access_token_['result']['access_token'];
 
 		curl_setopt_array($curl, array(
@@ -147,8 +147,8 @@ if( !function_exists('ggpb_charge_verify') ){
 		return ['result_code'=>$result_code,'result'=>$result];
 	}
 }
-if( !function_exists('ggpb_get_string_between') ){
-	function ggpb_get_string_between($string, $start, $end){
+if( !function_exists('gib_get_string_between') ){
+	function gib_get_string_between($string, $start, $end){
 		$string = " ".$string;
 		$ini = strpos($string,$start);
 		if ($ini == 0) return "";
@@ -157,8 +157,8 @@ if( !function_exists('ggpb_get_string_between') ){
 		return substr($string,$ini,$len);
 	}
 }
-if( !function_exists('ggpb_card_add') ){
-	function ggpb_card_add($card,$pay_method_id){
+if( !function_exists('gib_card_add') ){
+	function gib_card_add($card,$pay_method_id){
 		try {
 			Capsule::table('tblcreditcards')->where( 'pay_method_id', $pay_method_id)->delete();
 		}
@@ -174,7 +174,7 @@ if( !function_exists('ggpb_card_add') ){
 		try {
 			$createCardPayMethod = createCardPayMethod( // Function available in WHMCS 7.9 and later
 				$card['userid'],
-				'gofasgalaxpayboleto',
+				'gofasiuguboleto',
 				'111111111111'.$card['cclastfour'],
 				$card['cardexp'],
 				$card['cardtype'],
@@ -187,14 +187,14 @@ if( !function_exists('ggpb_card_add') ){
 			$error .= $e->getMessage();
 		}
 		if($error){
-			ggpb_card_del($card['myId']);
+			gib_card_del($card['myId']);
 			return $error;
 		}
 		return 'success';
 	}
 }
-if( !function_exists('ggpb_card_del') ){
-	function ggpb_card_del($pay_method_id){
+if( !function_exists('gib_card_del') ){
+	function gib_card_del($pay_method_id){
 		try {
 			Capsule::table('tblcreditcards')->where( 'pay_method_id', $pay_method_id)->delete();
 		}
@@ -213,14 +213,14 @@ if( !function_exists('ggpb_card_del') ){
 		return 'success';
 	}
 }
-if( !function_exists('ggpb_add_trans') ){
-	function ggpb_add_trans( $user_id, $invoice_id, $amount, $fee, $charge_id, $description ){	
+if( !function_exists('gib_add_trans') ){
+	function gib_add_trans( $user_id, $invoice_id, $amount, $fee, $charge_id, $description ){	
  		$addtransvalues['userid'] = $user_id;
  		$addtransvalues['invoiceid'] = $invoice_id;
  		$addtransvalues['description'] = $description;
  		$addtransvalues['amountin'] = $amount;
  		$addtransvalues['fees'] = $fee;
- 		$addtransvalues['paymentmethod'] = 'gofasgalaxpayboleto';
+ 		$addtransvalues['paymentmethod'] = 'gofasiuguboleto';
  		$addtransvalues['transid'] = $charge_id;
  		$addtransvalues['date'] = date('d/m/Y');
 		$addtransresults = localAPI( "addtransaction", $addtransvalues, (int)$params['admin']);
@@ -234,10 +234,10 @@ if( !function_exists('ggpb_add_trans') ){
 	}
 }
 
-if(!function_exists('ggpb_customer') ){
-	function ggpb_customer($client_id){
+if(!function_exists('gib_customer') ){
+	function gib_customer($client_id){
 		//Determine custom fields id
-		$params = getGatewayVariables('gofasgalaxpayboleto');
+		$params = getGatewayVariables('gofasiuguboleto');
 		$client = localAPI('GetClientsDetails',array( 'clientid' => $client_id, 'stats' => false, ), $params['admin']);
 		foreach( Capsule::table('tblcustomfields')->where('type','=','client')->get() as $customfield ){
 			$customfield_id = $customfield->id;
@@ -393,8 +393,8 @@ if(!function_exists('ggpb_customer') ){
 		return $customer;
 	}
 }
-if( !function_exists('ggpb_save_qrc') ){
-	function ggpb_save_qrc($qr_code){
+if( !function_exists('gib_save_qrc') ){
+	function gib_save_qrc($qr_code){
 		$data = array(
 			'invoice_id'=>$qr_code['invoice_id'],
 			'charge_id'=>$qr_code['charge_id'],
@@ -406,48 +406,48 @@ if( !function_exists('ggpb_save_qrc') ){
 			'updated_at'=>date("Y-m-d H:i:s"),
 		);
 	try {
-		$save_qrc = Capsule::table('gofasgalaxpayboleto')->insert($data);
+		$save_qrc = Capsule::table('gofasiuguboleto')->insert($data);
 		return 'success';
 	}
 	catch (\Exception $e){
 		return $e->getMessage();
 	}
 }}
-if(!function_exists('ggpb_update_qrc') ){
-	function ggpb_update_qrc($data){
-		$params = getGatewayVariables('gofasgalaxpayboleto');
-		$local_qrc = ggpb_get_local_qrc($data['invoice_id']);
+if(!function_exists('gib_update_qrc') ){
+	function gib_update_qrc($data){
+		$params = getGatewayVariables('gofasiuguboleto');
+		$local_qrc = gib_get_local_qrc($data['invoice_id']);
 		$data['created_at'] = $local_qrc['created_at'];
 		$data['updated_at']= date("Y-m-d H:i:s");
 		
 	try {
-		$update_qrc = Capsule::table('gofasgalaxpayboleto')->where('invoice_id', '=',$data['invoice_id'])->update($data);
+		$update_qrc = Capsule::table('gofasiuguboleto')->where('invoice_id', '=',$data['invoice_id'])->update($data);
 		if($params['log']){
-			logModuleCall('gofasgalaxpayboleto','ggpb_update_qrc',array('data'=>$data),'post',array('update_qrc' => $update_qrc),'replaceVars');
+			logModuleCall('gofasiuguboleto','gib_update_qrc',array('data'=>$data),'post',array('update_qrc' => $update_qrc),'replaceVars');
 		}
 		return 'success';
 	}
 	catch (\Exception $e){
 		if($params['log']){
-			logModuleCall('gofasgalaxpayboleto','ggpb_update_qrc',array('data'=>$data),'post',array('update_qrc' => $update_qrc),'replaceVars');
+			logModuleCall('gofasiuguboleto','gib_update_qrc',array('data'=>$data),'post',array('update_qrc' => $update_qrc),'replaceVars');
 		}
 		return $e->getMessage();
 	}
 }}
-if( !function_exists('ggpb_get_local_qrc') ){
-	function ggpb_get_local_qrc($invoice_id){
-		$params_api = ggpb_api_connect();
-		foreach( Capsule::table('gofasgalaxpayboleto')->where('invoice_id','=', $invoice_id)->where('api_mode','=',$params_api['api_mode'])->get() as $key => $value ){
+if( !function_exists('gib_get_local_qrc') ){
+	function gib_get_local_qrc($invoice_id){
+		$params_api = gib_api_connect();
+		foreach( Capsule::table('gofasiuguboleto')->where('invoice_id','=', $invoice_id)->where('api_mode','=',$params_api['api_mode'])->get() as $key => $value ){
 			$qrc_for_invoice[$key] = json_decode(json_encode($value), true);
 		}
 		return $qrc_for_invoice['0'];
 	}
 }
-if( !function_exists('ggpb_verify_install') ){
-	function ggpb_verify_install(){
-		if( !Capsule::schema()->hasTable('gofasgalaxpayboleto') ){
+if( !function_exists('gib_verify_install') ){
+	function gib_verify_install(){
+		if( !Capsule::schema()->hasTable('gofasiuguboleto') ){
 			try {
-				Capsule::schema()->create('gofasgalaxpayboleto', function($table){
+				Capsule::schema()->create('gofasiuguboleto', function($table){
 					$table->string('invoice_id');
 					$table->string('charge_id');
 					$table->string('amount');
@@ -471,8 +471,8 @@ if( !function_exists('ggpb_verify_install') ){
 	}
 }
 // Admin functions
-if( !function_exists('ggpb_whmcs_url') ){
-	function ggpb_whmcs_url(){
+if( !function_exists('gib_whmcs_url') ){
+	function gib_whmcs_url(){
 		$url		= (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 		if( stripos( $url, '/configgateways.php') !== false){
 			$whmcs_url__ = str_replace("\\",'/',(isset($_SERVER['HTTPS']) ? "https://" : "http://").$_SERVER['HTTP_HOST'].substr(getcwd(),strlen($_SERVER['DOCUMENT_ROOT'])));
@@ -480,36 +480,36 @@ if( !function_exists('ggpb_whmcs_url') ){
 			$vtokens = explode('/', $url);
 			$whmcs_admin_path = '/'.$vtokens[sizeof($vtokens)-2].'/';
 			$whmcs_url = str_replace( $whmcs_admin_path, '', $admin_url).'/';
-			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'ggpbwhmcsurl') -> get( array( 'value','created_at') ) as $ggpbwhmcsurl_ ){
-				$ggpbwhmcsurl					= $ggpbwhmcsurl_->value;
-				$ggpbwhmcsurl_created_at			= $ggpbwhmcsurl_->created_at;
+			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'gibwhmcsurl') -> get( array( 'value','created_at') ) as $gibwhmcsurl_ ){
+				$gibwhmcsurl					= $gibwhmcsurl_->value;
+				$gibwhmcsurl_created_at			= $gibwhmcsurl_->created_at;
 			}
-			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'ggpbwhmcsadminurl') -> get( array( 'value','created_at') ) as $ggpbwhmcsadminurl_ ){
-				$ggpbwhmcsadminurl				= $ggpbwhmcsadminurl_->value;
-				$ggpbwhmcsadminurl_created_at	= $ggpbwhmcsurl_->created_at;
+			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'gibwhmcsadminurl') -> get( array( 'value','created_at') ) as $gibwhmcsadminurl_ ){
+				$gibwhmcsadminurl				= $gibwhmcsadminurl_->value;
+				$gibwhmcsadminurl_created_at	= $gibwhmcsurl_->created_at;
 			}
-			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'ggpbwhmcsadminpath') -> get( array( 'value','created_at') ) as $ggpbwhmcsadminpath_ ){
-				$ggpbwhmcsadminpath				= $ggpbwhmcsadminpath_->value;
-				$ggpbwhmcsadminpath_created_at	= $ggpbwhmcsurl_->created_at;
+			foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'gibwhmcsadminpath') -> get( array( 'value','created_at') ) as $gibwhmcsadminpath_ ){
+				$gibwhmcsadminpath				= $gibwhmcsadminpath_->value;
+				$gibwhmcsadminpath_created_at	= $gibwhmcsurl_->created_at;
 			}
-			if( !$ggpbwhmcsurl ){
-				try { Capsule::table('tblconfiguration')->insert(array('setting' => 'ggpbwhmcsurl', 'value' => $whmcs_url, 'created_at' => date("Y-m-d H:i:s") , 'updated_at' => date("Y-m-d H:i:s")));}
+			if( !$gibwhmcsurl ){
+				try { Capsule::table('tblconfiguration')->insert(array('setting' => 'gibwhmcsurl', 'value' => $whmcs_url, 'created_at' => date("Y-m-d H:i:s") , 'updated_at' => date("Y-m-d H:i:s")));}
 				catch (\Exception $e){ $e->getMessage(); }
-				try { Capsule::table('tblconfiguration')->insert(array('setting' => 'ggpbwhmcsadminurl', 'value' => $admin_url, 'created_at' => date("Y-m-d H:i:s") , 'updated_at' => date("Y-m-d H:i:s")));}
+				try { Capsule::table('tblconfiguration')->insert(array('setting' => 'gibwhmcsadminurl', 'value' => $admin_url, 'created_at' => date("Y-m-d H:i:s") , 'updated_at' => date("Y-m-d H:i:s")));}
 				catch (\Exception $e){ $e->getMessage(); }
-				try { Capsule::table('tblconfiguration')->insert(array('setting' => 'ggpbwhmcsadminpath', 'value' => $whmcs_admin_path, 'created_at' => date("Y-m-d H:i:s") , 'updated_at' => date("Y-m-d H:i:s")));}
+				try { Capsule::table('tblconfiguration')->insert(array('setting' => 'gibwhmcsadminpath', 'value' => $whmcs_admin_path, 'created_at' => date("Y-m-d H:i:s") , 'updated_at' => date("Y-m-d H:i:s")));}
 				catch (\Exception $e){ $e->getMessage(); }
 			}
-			if( $ggpbwhmcsurl and ($whmcs_url !== $ggpbwhmcsurl) ){
-				try { Capsule::table('tblconfiguration')->where( 'setting', 'ggpbwhmcsurl')->update(array('value' => $whmcs_url, 'created_at' =>  $ggpbwhmcsurl_created_at , 'updated_at' => date("Y-m-d H:i:s")));}
+			if( $gibwhmcsurl and ($whmcs_url !== $gibwhmcsurl) ){
+				try { Capsule::table('tblconfiguration')->where( 'setting', 'gibwhmcsurl')->update(array('value' => $whmcs_url, 'created_at' =>  $gibwhmcsurl_created_at , 'updated_at' => date("Y-m-d H:i:s")));}
 				catch (\Exception $e){$e->getMessage();}
 			}
-			if( $ggpbwhmcsadminurl and ($admin_url !== $ggpbwhmcsadminurl) ){
-				try { Capsule::table('tblconfiguration')->where( 'setting', 'ggpbwhmcsadminurl')->update(array('value' => $admin_url, 'created_at' =>  $ggpbwhmcsadminurl_created_at , 'updated_at' => date("Y-m-d H:i:s")));}
+			if( $gibwhmcsadminurl and ($admin_url !== $gibwhmcsadminurl) ){
+				try { Capsule::table('tblconfiguration')->where( 'setting', 'gibwhmcsadminurl')->update(array('value' => $admin_url, 'created_at' =>  $gibwhmcsadminurl_created_at , 'updated_at' => date("Y-m-d H:i:s")));}
 				catch (\Exception $e){$e->getMessage();}
 			}
-			if( $ggpbwhmcsadminpath and ($whmcs_admin_path !== $ggpbwhmcsadminpath) ){
-				try { Capsule::table('tblconfiguration')->where( 'setting', 'ggpbwhmcsadminpath')->update(array('value' => $whmcs_admin_path, 'created_at' =>  $ggpbwhmcsadminpath_created_at , 'updated_at' => date("Y-m-d H:i:s")));}
+			if( $gibwhmcsadminpath and ($whmcs_admin_path !== $gibwhmcsadminpath) ){
+				try { Capsule::table('tblconfiguration')->where( 'setting', 'gibwhmcsadminpath')->update(array('value' => $whmcs_admin_path, 'created_at' =>  $gibwhmcsadminpath_created_at , 'updated_at' => date("Y-m-d H:i:s")));}
 				catch (\Exception $e){$e->getMessage();}
 			}
 
@@ -517,8 +517,8 @@ if( !function_exists('ggpb_whmcs_url') ){
 		return ['url'=>$whmcs_url,'admin_url'=>$admin_url,'admin_path'=>$whmcs_admin_path];
 	}
 }
-if( !function_exists('ggpb_get_embed') ){
-	function ggpb_get_embed($page_id,$referer,$module_version){
+if( !function_exists('gib_get_embed') ){
+	function gib_get_embed($page_id,$referer,$module_version){
 		$query = 'https://gofas.net/cliente/gofas/updates/?embed='.$page_id.'&referer='.$referer.'&version='.$module_version;
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
@@ -531,26 +531,26 @@ if( !function_exists('ggpb_get_embed') ){
 		return ['embed'=>$embed,'http_code'=>$http_status];
 	}
 }
-if(!function_exists('ggpb_encrypt')){
-	function ggpb_encrypt($q) {
+if(!function_exists('gib_encrypt')){
+	function gib_encrypt($q) {
 	    $encryptionMethod = "AES-256-CBC";
 		$secretHash = "535ba9979bc6c7ff151f2136cd13b0f9";
 	    return openssl_encrypt($q, $encryptionMethod, $secretHash);
 	}
 }
-if(!function_exists('ggpb_decrypt')){
-	function ggpb_decrypt($q){
+if(!function_exists('gib_decrypt')){
+	function gib_decrypt($q){
 		$encryptionMethod = "AES-256-CBC";
 		$secretHash = "535ba9979bc6c7ff151f2136cd13b0f9";
 	    return openssl_decrypt($q, $encryptionMethod, $secretHash);
 	}
 }
-if( !function_exists('ggpb_get_version') ){
-	function ggpb_get_version($page_id,$referer,$module_version){
+if( !function_exists('gib_get_version') ){
+	function gib_get_version($page_id,$referer,$module_version){
 		$currentUser = new \WHMCS\Authentication\CurrentUser;
 		$admin_ = json_decode(json_encode($currentUser->admin()),true);
 		$admin = ['email'=>$admin_['email'],'firstname'=>$admin_['firstname'],'lastname'=>$admin_['lastname']];
-		$query = 'https://gofas.net/br/updates/?software='.$page_id.'&referer='.$referer.'&version='.$module_version.'&email='.$admin['email'].'&firstname='.$admin['firstname'].'&lastname='.$admin['lastname'].ggpb_sysinfo();
+		$query = 'https://gofas.net/br/updates/?software='.$page_id.'&referer='.$referer.'&version='.$module_version.'&email='.$admin['email'].'&firstname='.$admin['firstname'].'&lastname='.$admin['lastname'].gib_sysinfo();
 		$curl = curl_init();
 		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST,0);
 		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER,0);
@@ -562,8 +562,8 @@ if( !function_exists('ggpb_get_version') ){
 		return ['version'=>$available_version_,'http_code'=>$http_status];
 	}
 }
-if(!function_exists('ggpb_sysinfo')){
-	function ggpb_sysinfo(){
+if(!function_exists('gib_sysinfo')){
+	function gib_sysinfo(){
 		foreach( Capsule::table('tblconfiguration')
 		->where('setting','=','Version')
 		->get(['value']) as $data1 ){
@@ -577,9 +577,9 @@ if(!function_exists('ggpb_sysinfo')){
 		return '&whmcs_version='.$Version.'&php_version='.$PHPVersion;
 	}
 }
-if(!function_exists('ggpb_verify_module_updates')){
-	function ggpb_verify_module_updates($page_id,$referer,$module_version){
-		foreach( Capsule::table('tblconfiguration')->where('setting','=','ggpb_version')->get(['value','created_at','updated_at']) as $version_ ){
+if(!function_exists('gib_verify_module_updates')){
+	function gib_verify_module_updates($page_id,$referer,$module_version){
+		foreach( Capsule::table('tblconfiguration')->where('setting','=','gib_version')->get(['value','created_at','updated_at']) as $version_ ){
 			$version		= json_decode($version_->value, true);
 			$local_version	= $version['local_version'];
 			$last_version	= $version['last_version'];
@@ -590,8 +590,8 @@ if(!function_exists('ggpb_verify_module_updates')){
 		}
 		///// Get
 		if(!$version){
-			$get_version = ggpb_get_version($page_id,$referer,$module_version,$admin);
-			$get_embed	 = ggpb_get_embed($page_id,$referer,$module_version);
+			$get_version = gib_get_version($page_id,$referer,$module_version,$admin);
+			$get_embed	 = gib_get_embed($page_id,$referer,$module_version);
 			
 			if((int)$get_version['http_code'] !== 200){
 				$error .= $get_version['http_code'].' '.$get_version['version'];
@@ -601,8 +601,8 @@ if(!function_exists('ggpb_verify_module_updates')){
 			}
 		}
 		if($version and strtotime($updated_at) < strtotime("-1 day")){
-			$get_version = ggpb_get_version($page_id,$referer,$module_version);
-			$get_embed	 = ggpb_get_embed($page_id,$referer,$module_version);
+			$get_version = gib_get_version($page_id,$referer,$module_version);
+			$get_embed	 = gib_get_embed($page_id,$referer,$module_version);
 			if((int)$get_version['http_code'] !== 200){
 				$error .= $get_version['http_code'].' '.$get_version['version'];
 			}
@@ -611,8 +611,8 @@ if(!function_exists('ggpb_verify_module_updates')){
 			}
 		}
 		if($version and (string)$module_version !== (string)$local_version){
-			$get_version = ggpb_get_version($page_id,$referer,$module_version,$admin);
-			$get_embed	 = ggpb_get_embed($page_id,$referer,$module_version);
+			$get_version = gib_get_version($page_id,$referer,$module_version,$admin);
+			$get_embed	 = gib_get_embed($page_id,$referer,$module_version);
 			if((int)$get_version['http_code'] !== 200){
 				$error .= $get_version['http_code'].' '.$get_version['version'];
 			}
@@ -627,16 +627,16 @@ if(!function_exists('ggpb_verify_module_updates')){
 		if(!$version and $get_version['version'] and $get_embed['embed']){
 			$local_version = $module_version;
 			$last_version = $get_version['version'];
-			$embed		  = ggpb_encrypt($get_embed['embed']);
+			$embed		  = gib_encrypt($get_embed['embed']);
 			$created_at		= date("Y-m-d H:i:s");
 			$updated_at		= date("Y-m-d H:i:s");
 
 			try { Capsule::table('tblconfiguration')->insert(array(
-				'setting' => 'ggpb_version',
+				'setting' => 'gib_version',
 				'value' => json_encode([
 					'local_version'=>$module_version,
 					'last_version'=>$get_version['version'],
-					'check'=>ggpb_encrypt($get_embed['embed'])
+					'check'=>gib_encrypt($get_embed['embed'])
 				]),
 				'created_at' => $created_at,
 				'updated_at' => $updated_at
@@ -653,11 +653,11 @@ if(!function_exists('ggpb_verify_module_updates')){
 			$last_version !== $available_version
 		)){
 			try {
-				Capsule::table('tblconfiguration')->where('setting','ggpb_version')->update([
+				Capsule::table('tblconfiguration')->where('setting','gib_version')->update([
 					'value' => json_encode([
 						'local_version'=>$module_version,
 						'last_version'=>$available_version,
-						'check'=>ggpb_encrypt($get_embed['embed'])
+						'check'=>gib_encrypt($get_embed['embed'])
 					]),
 					'created_at' =>  $created_at,
 					'updated_at' => date("Y-m-d H:i:s")]
@@ -670,11 +670,11 @@ if(!function_exists('ggpb_verify_module_updates')){
 		// update
 		if($version and $get_version['version'] and $get_embed['embed'] and (string)$local_version !== (string)$module_version){
 			try {
-				Capsule::table('tblconfiguration')->where('setting','ggpb_version')->update([
+				Capsule::table('tblconfiguration')->where('setting','gib_version')->update([
 					'value' => json_encode([
 						'local_version'=>$module_version,
 						'last_version'=>$available_version,
-						'check'=>ggpb_encrypt($get_embed['embed'])
+						'check'=>gib_encrypt($get_embed['embed'])
 					]),
 					'created_at' =>  $created_at,
 					'updated_at' => date("Y-m-d H:i:s")]
@@ -704,35 +704,35 @@ if(!function_exists('ggpb_verify_module_updates')){
 		];
 	}
 }
-if(!function_exists('ggpb_version')){
-	function ggpb_version($opt=1){
-		foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'ggpb_version') -> get( array( 'value','created_at') ) as $ggpb_version_ ){
-			$ggpb_version				= $ggpb_version_->value;
-			$ggpb_version_created_at	= $ggpb_version_->created_at;
+if(!function_exists('gib_version')){
+	function gib_version($opt=1){
+		foreach( Capsule::table('tblconfiguration') -> where('setting', '=', 'gib_version') -> get( array( 'value','created_at') ) as $gib_version_ ){
+			$gib_version				= $gib_version_->value;
+			$gib_version_created_at	= $gib_version_->created_at;
 		}
 		if($opt=1){ // local_version string
-			$version = json_decode($ggpb_version, true);
+			$version = json_decode($gib_version, true);
 			return $version['local_version'];
 		}
 		if($opt=2){ // local_version integer
-			$version = json_decode($ggpb_version, true);
+			$version = json_decode($gib_version, true);
 			return (int)preg_replace("/[^0-9]/", "", $version['local_version']);
 		}
 		if($opt=3){ // full
-			return$ggpb_version;
+			return$gib_version;
 		}
 	}
 }
-if(!function_exists('ggpb_tbladmins')){
-	function ggpb_tbladmins(){
+if(!function_exists('gib_tbladmins')){
+	function gib_tbladmins(){
 		foreach( Capsule::table('tbladmins') -> get() as $tbladmins_ ){
 			$tbladmins[$tbladmins_->id] = $tbladmins_->id.' - '.$tbladmins_->firstname.' '.$tbladmins_->lastname.' ('.$tbladmins_->username.')';
 		}
 		return $tbladmins;
 	}
 }
-if(!function_exists('ggpb_tblticketdepartments')){
-	function ggpb_tblticketdepartments(){
+if(!function_exists('gib_tblticketdepartments')){
+	function gib_tblticketdepartments(){
 		$tblticketdepartments[] = '';
 		foreach( Capsule::table('tblticketdepartments') -> get() as $tblticketdepartments_ ){
 			$tblticketdepartments_id			= $tblticketdepartments_->id;
@@ -742,8 +742,8 @@ if(!function_exists('ggpb_tblticketdepartments')){
 		return $tblticketdepartments;
 	}
 }
-if(!function_exists('ggpb_line_items')){
-	function ggpb_line_items($invoice_id){
+if(!function_exists('gib_line_items')){
+	function gib_line_items($invoice_id){
 		$invoice			= localAPI('getinvoice',array('invoiceid'=>$invoice_id),(int)$params['admin']);
 		// Itens de Linha - Serviços/produtos relacionados à fatura
 		$invoice_items_item	= $invoice['items']['item'];

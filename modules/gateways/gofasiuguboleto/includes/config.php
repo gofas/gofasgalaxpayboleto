@@ -1,50 +1,50 @@
 <?php
 /**
- * Módulo GalaxPay Boleto para WHMCS
+ * Módulo iugu Boleto para WHMCS
  * @copyright	2022 Gofas Software
- * @see			https://gofas.net/?p=14695
+ * @see			https://gofas.net/?p=14942
  * @license		https://gofas.net/?p=9340
  * @support		https://gofas.net/?p=14687
- * @version		1.1.0
+ * @version		1.0.0
  */
 
 if( !defined('WHMCS')){ die(''); }
 use WHMCS\Database\Capsule;
-function gofasgalaxpayboleto_MetaData(){
+function gofasiuguboleto_MetaData(){
     return array(
-        'DisplayName' => 'Gofas GalaxPay - Boleto',
+        'DisplayName' => 'Gofas iugu - Boleto',
         'APIVersion' => '1.1',
     );
 }
-function gofasgalaxpayboleto_config(){
+function gofasiuguboleto_config(){
 	if(stripos($_SERVER['REQUEST_URI'], '/configgateways.php')!==false){
-		$module_version	= '1.1.0';
-		$module_page	= '14695';
+		$module_version	= '1.0.0';
+		$module_page	= '14942';
 		require_once __DIR__.'/functions.php';
-		$verify_install = ggpb_verify_install();
-		$whmcs_url = ggpb_whmcs_url();
-		$check_updates = ggpb_verify_module_updates($module_page,$whmcs_url['url'],$module_version);
-		//$embed = ggpb_get_embed('14695',$whmcs_url['url'],$module_version);
-		$tbladmins = ggpb_tbladmins();
-		//$tblticketdepartments = ggpb_tblticketdepartments();
+		$verify_install = gib_verify_install();
+		$whmcs_url = gib_whmcs_url();
+		$check_updates = gib_verify_module_updates($module_page,$whmcs_url['url'],$module_version);
+		//$embed = gib_get_embed('14942',$whmcs_url['url'],$module_version);
+		$tbladmins = gib_tbladmins();
+		//$tblticketdepartments = gib_tblticketdepartments();
 		//echo '<pre>',print_r($check_updates),'</pre>';
 		
 		$opt_num = 1;
 		$renderize = array(
 			'FriendlyName' => array(
 				'Type' => 'System',
-				'Value' => 'Gofas GalaxPay - Boleto',
+				'Value' => 'Gofas iugu - Boleto',
 			),
 			'separator_1' => array(
 				'Description' => '
-				<div class="ggpb_separator" style="padding: 1px 15px 9px;">
+				<div class="gib_separator" style="padding: 1px 15px 9px;">
 					<div style="float: right; padding: 0px;">
-					'.ggpb_decrypt($check_updates['check']).'
+					'.gib_decrypt($check_updates['check']).'
 					</div>
 					<div style="margin-left: 10px;">
-						<h4 style="padding-top: 5px;">Módulo Gofas GalaxPay - Boleto para WHMCS v'.$module_version.'</h4>
+						<h4 style="padding-top: 5px;">Módulo Gofas iugu - Boleto para WHMCS v'.$module_version.'</h4>
 						'.$check_updates['message'].'
-						<p><a style="text-decoration:underline;" target="_blank" href="https://gofas.net/?p=14695#configuration">Documentação do módulo</a> | <a style="text-decoration:underline;" target="_blank" href="https://docs.galaxpay.com.br/">Documentação da API GalaxPay</a></p>
+						<p><a style="text-decoration:underline;" target="_blank" href="https://gofas.net/?p=14942#configuration">Documentação do módulo</a> | <a style="text-decoration:underline;" target="_blank" href="https://docs.iugu.com.br/">Documentação da API iugu</a></p>
 						<p>Crie um <a style="text-decoration:underline;" target="_blank" href="'.$whmcs_url['admin_url'].'/configcustomfields.php">campo personalizado de cliente</a> para CPF e/ou CNPJ, ou se preferir, crie dois campos distintos, um campo apenas para CPF e outro campo para CNPJ. O módulo identifica os campos do perfil do cliente automaticamente.</p>
 					</div>
 				</div>',
@@ -54,36 +54,36 @@ function gofasgalaxpayboleto_config(){
 			),
 			// Secret Token
 			'galax_id' => array(
-				'FriendlyName' => $opt_num++.'- Galax ID<span class="ggpb_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax ID<span class="gib_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax ID | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/suporte">Obter Galax ID</a>',
+				'Description' => '<span class="gib_required_txt">(Obrigatório)</span> Galax ID | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.iugu.com.br/suporte">Obter Galax ID</a>',
 			),
 			'galax_hash' => array(
-				'FriendlyName' => $opt_num++.'- Galax Hash<span class="ggpb_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax Hash<span class="gib_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax Hash | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/suporte">Obter Galax Hash</a>',
+				'Description' => '<span class="gib_required_txt">(Obrigatório)</span> Galax Hash | Produção. <a target="_blank" style="text-decoration:underline;" href="https://docs.iugu.com.br/suporte">Obter Galax Hash</a>',
 			),
 			'separator_3' => array(
 				'Description' => '<h2>Credenciais Sandbox (testes)</h2>',
 			),
 			'sandbox_galax_id' => array(
-				'FriendlyName' => $opt_num++.'- Galax ID<span class="ggpb_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax ID<span class="gib_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax ID | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/autenticacao">Obter Galax ID</a>',
+				'Description' => '<span class="gib_required_txt">(Obrigatório)</span> Galax ID | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.iugu.com.br/autenticacao">Obter Galax ID</a>',
 			),
 			// Sandbox Secret Token
 			'sandbox_galax_hash' => array(
-				'FriendlyName' => $opt_num++.'- Galax Hash<span class="ggpb_required">*</span>',
+				'FriendlyName' => $opt_num++.'- Galax Hash<span class="gib_required">*</span>',
 				'Type' => 'text',
 				'Size' => '50',
 				'Default' => '',
-				'Description' => '<span class="ggpb_required_txt">(Obrigatório)</span> Galax Hash | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.galaxpay.com.br/autenticacao">Obter Galax Hash</a>',
+				'Description' => '<span class="gib_required_txt">(Obrigatório)</span> Galax Hash | Testes. <a target="_blank" style="text-decoration:underline;" href="https://docs.iugu.com.br/autenticacao">Obter Galax Hash</a>',
 			),
 			'separator_3_1' => array(
 				'Description' => '<span></span>',
@@ -116,7 +116,7 @@ function gofasgalaxpayboleto_config(){
 				'Type' => 'text',
 				'Size' => '10',
 				'Default' => '0.99',
-				'Description' => 'Insira o valor da tarifa paga à GalaxPay por cada Boleto recebido. Formato: Decimal, separado por ponto (0.99)',
+				'Description' => 'Insira o valor da tarifa paga à iugu por cada Boleto recebido. Formato: Decimal, separado por ponto (0.99)',
 			),
 			// Top billet button message 
 			'message' => array(
