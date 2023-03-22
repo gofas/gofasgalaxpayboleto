@@ -1,15 +1,9 @@
 name: Changelog
 on:
-  pull_request:
-    types: [closed]
   release:
     types: [published]
   issues:
     types: [closed, edited]
-  push:
-    branches: [master]
-    tags:
-      - v*
 jobs:
   generate_changelog:
     runs-on: ubuntu-latest
