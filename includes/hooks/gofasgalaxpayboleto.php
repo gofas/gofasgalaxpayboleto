@@ -5,9 +5,28 @@
  * @see			https://gofas.net/?p=14641
  * @license		https://gofas.net/?p=9340
  * @support		https://gofas.net/?p=14644
- * @version		0.1.0
+ * @version		1.2.0
  */
 use WHMCS\Database\Capsule;
+use WHMCS\Aplication;
+if(!function_exists('ggpb_get_protected_property')){
+	function ggpb_get_protected_property($object, $property){
+	    $reflectedClass = new \ReflectionClass($object);
+	    $reflection = $reflectedClass->getProperty($property);
+	    $reflection->setAccessible(true);
+	    return $reflection->getValue($object);
+	}
+}
+if( !function_exists('ggpb_get_string_between') ){
+    function ggpb_get_string_between($string, $start, $end){
+        $string = " ".$string;
+        $ini = strpos($string,$start);
+        if ($ini == 0) return "";
+        $ini += strlen($start);   
+        $len = strpos($string,$end,$ini) - $ini;
+        return substr($string,$ini,$len);
+    }
+}
 
 add_hook("AfterCronJob",1,"ggpb_check_status_updates");
 add_hook("EmailPreSend",1,"ggpb_qrcode_mergetags");
@@ -66,7 +85,9 @@ if(!function_exists('ggpb_qrcode_mergetags')){
 
 if(!function_exists('ggpb_check_status_updates')){
 function ggpb_check_status_updates($vars){
-	require_once __DIR__.'/../../modules/gateways/gofasgalaxpayboleto/includes/functions.php';
+	$self = App::self();
+	$root_dir = '/'.ggpb_get_string_between(ggpb_get_protected_property(ggpb_get_protected_property(ggpb_get_protected_property(ggpb_get_protected_property($self, 'clientTemplate'), 'config'),'configFile'),'path'),'/','/templates/');
+	require_once $root_dir.'/modules/gateways/gofasgalaxpayboleto/includes/functions.php';
 	$params = getGatewayVariables('gofasgalaxpayboleto');
 	$params_api = ggpb_api_connect();
 	// Get Billets
