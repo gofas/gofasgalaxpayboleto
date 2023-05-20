@@ -4,6 +4,14 @@
 
 [Full Changelog](https://github.com/mauriciogofas/gofasgalaxpayboleto/compare/23c3604c3e9c94557bc3d692d0407d526eadc075...HEAD)
 
+**Implemented enhancements:**
+
+- Obtem diretório raíz do WHMCS consultando no banco de dados as informações da instalação a fim de evitar erros quando o arquivo é invocado em áreas imprevisíveis do sistema onde a busca relativa à localização atual do script não funciona como esperado [\#4](https://github.com/mauriciogofas/gofasgalaxpayboleto/issues/4)
+
+**Fixed bugs:**
+
+- Remove duplicate function [\#1](https://github.com/mauriciogofas/gofasgalaxpayboleto/issues/1)
+
 **Closed issues:**
 
 - compatibilidade php8+ [\#2](https://github.com/mauriciogofas/gofasgalaxpayboleto/issues/2)
