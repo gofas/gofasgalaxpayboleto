@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/mauriciogofas/gofasgalaxpayboleto/tree/HEAD)
+## [v1.2.0](https://github.com/mauriciogofas/gofasgalaxpayboleto/tree/v1.2.0) (20/05/2023)
 
-[Full Changelog](https://github.com/mauriciogofas/gofasgalaxpayboleto/compare/23c3604c3e9c94557bc3d692d0407d526eadc075...HEAD)
+[Full Changelog](https://github.com/mauriciogofas/gofasgalaxpayboleto/compare/23c3604c3e9c94557bc3d692d0407d526eadc075...v1.2.0)
 
 **Implemented enhancements:**
 
