@@ -43,8 +43,7 @@ if(!function_exists('ggpb_qrcode_mergetags_fields')){
 }
 if(!function_exists('ggpb_qrcode_mergetags')){
     function ggpb_qrcode_mergetags($vars){
-        $params = getGatewayVariables('gofasgalaxpayboleto');
-	//$boletoonemail					= $params['boletoonemail'];
+    //$boletoonemail					= $params['boletoonemail'];
 	
 	// Invoice Created | Invoice Payment Reminder | First Invoice Overdue Notice |  Second Invoice Overdue Notice |  Third Invoice Overdue Notice 
     if(
@@ -54,6 +53,7 @@ if(!function_exists('ggpb_qrcode_mergetags')){
 		$vars['messagename'] === 'Second Invoice Overdue Notice' ||
 		$vars['messagename'] === 'Third Invoice Overdue Notice'
 	){
+		$params = getGatewayVariables('gofasgalaxpayboleto');
 		$ggpb_merge_fields	= array();
 		$invoice			= localAPI( 'GetInvoice', array('invoiceid' => $vars['relid']), (int)$params['admin']);
 		
