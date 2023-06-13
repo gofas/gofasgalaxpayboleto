@@ -5,7 +5,7 @@
  * @see			https://gofas.net/?p=14695
  * @license		https://gofas.net/?p=9340
  * @support		https://gofas.net/?p=14687
- * @version		1.2.0
+ * @version		1.2.1
  */
 
 if( !defined('WHMCS')){ die(''); }
@@ -18,7 +18,7 @@ function gofasgalaxpayboleto_MetaData(){
 }
 function gofasgalaxpayboleto_config(){
 	if(stripos($_SERVER['REQUEST_URI'], '/configgateways.php')!==false){
-		$module_version	= '1.2.0';
+		$module_version	= '1.2.1';
 		$module_page	= '14695';
 		require_once __DIR__.'/functions.php';
 		$verify_install = ggpb_verify_install();
