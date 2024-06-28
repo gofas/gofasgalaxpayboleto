@@ -12,7 +12,7 @@ if( !defined('WHMCS')){ die(''); }
 use WHMCS\Database\Capsule;
 function gofasgalaxpayboleto_MetaData(){
     return array(
-        'DisplayName' => 'Gofas GalaxPay - Boleto',
+        'DisplayName' => 'Gofas GalaxPay Boleto',
         'APIVersion' => '1.1',
     );
 }
@@ -33,7 +33,7 @@ function gofasgalaxpayboleto_config(){
 		$renderize = array(
 			'FriendlyName' => array(
 				'Type' => 'System',
-				'Value' => 'Gofas GalaxPay - Boleto',
+				'Value' => 'Gofas GalaxPay Boleto',
 			),
 			'separator_1' => array(
 				'Description' => '
@@ -42,7 +42,7 @@ function gofasgalaxpayboleto_config(){
 					'.ggpb_decrypt($check_updates['check']).'
 					</div>
 					<div style="margin-left: 10px;">
-						<h4 style="padding-top: 5px;">Módulo Gofas GalaxPay - Boleto para WHMCS v'.$module_version.'</h4>
+						<h4 style="padding-top: 5px;">Módulo Gofas GalaxPay Boleto para WHMCS v'.$module_version.'</h4>
 						'.$check_updates['message'].'
 						<p><a style="text-decoration:underline;" target="_blank" href="https://gofas.net/?p=14695#configuration">Documentação do módulo</a> | <a style="text-decoration:underline;" target="_blank" href="https://docs.galaxpay.com.br/">Documentação da API GalaxPay</a></p>
 						<p>Crie um <a style="text-decoration:underline;" target="_blank" href="'.$whmcs_url['admin_url'].'/configcustomfields.php">campo personalizado de cliente</a> para CPF e/ou CNPJ, ou se preferir, crie dois campos distintos, um campo apenas para CPF e outro campo para CNPJ. O módulo identifica os campos do perfil do cliente automaticamente.</p>
