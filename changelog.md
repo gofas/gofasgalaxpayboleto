@@ -1,6 +1,6 @@
 # Changelog
 
-## [Próxima atualização](https://github.com/gofas/gofasgalaxpayboleto/tree/HEAD)
+## [v1.3.0 - 12/07/2026](https://github.com/gofas/gofasgalaxpayboleto/releases/tag/v1.3.0)
 
 
 **Melhorias:**
@@ -11,7 +11,7 @@
 
 - Evita erro getGatewayVariables not defined na área do cliente - [#5](https://github.com/gofas/gofasgalaxpayboleto/issues/5) <a href="https://github.com/gofas/gofasgalaxpayboleto/issues?q=is%3Aissue+state%3Aclosed+label%3Abug" style="color:#a99c9c;text-decoration:none"><code>bug</code></a>
 
-[Comparar versões](https://github.com/gofas/gofasgalaxpayboleto/compare/v1.2.1...HEAD)
+[Comparar versões](https://github.com/gofas/gofasgalaxpayboleto/compare/v1.2.1...v1.3.0)
 
 ## [v1.2.1 - 07/06/2026](https://github.com/gofas/gofasgalaxpayboleto/releases/tag/v1.2.1)
 
