@@ -5,7 +5,7 @@
  * @see			https://gofas.net/?p=14695
  * @license		https://gofas.net/?p=9340
  * @support		https://gofas.net/?p=14687
- * @version		1.0.1
+ * @version		1.3.0
  */
 require_once __DIR__ . '/../../../../init.php';
 require_once __DIR__ . '/../../../../includes/gatewayfunctions.php';
@@ -231,7 +231,7 @@ if(!function_exists('ggpb_get_local_version')){
 }}
 if(!function_exists('ggpb_update_stats') ){
 	function ggpb_module_version(){
-		return '1.2.1';
+		return '1.3.0';
 	}
 	function ggpb_update_stats(){
 		$params = getGatewayVariables('gofasgalaxpayboleto');
