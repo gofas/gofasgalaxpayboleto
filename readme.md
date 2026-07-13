@@ -1,12 +1,28 @@
 # Módulo cel_cash Boleto para WHMCS
 
+[![versão](https://img.shields.io/github/v/release/gofas/gofasgalaxpayboleto?label=vers%C3%A3o&color=005071&style=flat-square)](https://github.com/gofas/gofasgalaxpayboleto/releases/latest)
+[![downloads](https://img.shields.io/github/downloads/gofas/gofasgalaxpayboleto/total?label=downloads&color=005071&style=flat-square)](https://github.com/gofas/gofasgalaxpayboleto/releases/latest)
+[![licença](https://img.shields.io/badge/licen%C3%A7a-propriet%C3%A1ria-005071?style=flat-square)](https://gofas.net/contrato-de-venda-de-licenca-de-uso-de-software/)
+[![suporte](https://img.shields.io/badge/suporte-f%C3%B3rum%20gratuito-ff8700?style=flat-square)](https://gofas.net/foruns/)
+
 Módulo gratuito de integração que automatiza a emissão de boletos registrados no WHMCS através da API cel_cash. Cobranças com o seu CPF ou CNPJ, sem carteira de cobrança e sem burocracia, com confirmação de pagamento e baixa automática das faturas. Desenvolvido pela Gofas Software.
+
+## Sumário
+
+- [Download](#download)
+- [Funcionalidades](#funcionalidades)
+- [Requisitos](#requisitos)
+- [Instalação](#instalação)
+- [Configuração](#configuração)
+- [Informações importantes](#informações-importantes)
+- [Suporte](#suporte)
+- [Licença](#licença)
 
 ## Download
 
-Baixe a versão mais recente:
+**[Baixar a versão mais recente](https://github.com/gofas/gofasgalaxpayboleto/releases/latest/download/gofasgalaxpayboleto.zip)**
 
-https://github.com/gofas/gofasgalaxpayboleto/releases/latest/download/gofasgalaxpayboleto.zip
+O download é contabilizado no site pelo contador de instalações do módulo.
 
 ## Funcionalidades
 
@@ -51,7 +67,7 @@ Crie um campo personalizado de cliente para CPF e/ou CNPJ, ou dois campos distin
 
 ### Opções do módulo
 
-<img src="https://raw.githubusercontent.com/gofas/gofasgalaxpayboleto/master/docs/img/tela-configuracoes-modulo.png" alt="Tela de configuracoes do modulo" width="640">
+<img src="https://raw.githubusercontent.com/gofas/gofasgalaxpayboleto/master/docs/img/tela-configuracoes-modulo-1.3.0.png" alt="Tela de configuracoes do modulo" width="640">
 
 - **Galax ID** e **Galax Hash**: credenciais do Webservice em produção.
 - **Galax ID** e **Galax Hash** (testes): credenciais do Webservice em sandbox.
