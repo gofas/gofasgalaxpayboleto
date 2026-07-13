@@ -5,6 +5,7 @@
 
 **Melhorias:**
 
+- readme: captura versionada, badges e sumario - [#9](https://github.com/gofas/gofasgalaxpayboleto/issues/9)
 - readme: marca correta e cel_cash (GalaxPay e a marca antiga) - [#8](https://github.com/gofas/gofasgalaxpayboleto/issues/8)
 - readme: conteudo da pagina do site transferido e captura de configuracao - [#7](https://github.com/gofas/gofasgalaxpayboleto/issues/7)
 
