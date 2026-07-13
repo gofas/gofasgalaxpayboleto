@@ -2,7 +2,7 @@
 
 [![versão](https://img.shields.io/github/v/release/gofas/gofasgalaxpayboleto?label=vers%C3%A3o&color=005071&style=flat-square)](https://github.com/gofas/gofasgalaxpayboleto/releases/latest)
 [![downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fgofas.net%2Fwp-json%2Fgofas%2Fv1%2Fbadge%2Fgofasgalaxpayboleto&style=flat-square)](https://github.com/gofas/gofasgalaxpayboleto/releases/latest)
-[![suporte](https://img.shields.io/badge/suporte-f%C3%B3rum%20gratuito-ff8700?style=flat-square)](https://gofas.net/foruns/)
+[![abrir issue](https://img.shields.io/badge/suporte-abrir%20issue-ff8700?style=flat-square)](https://gofas.net/?p=14687/#new-post)
 
 Módulo gratuito de integração que automatiza a emissão de boletos registrados no WHMCS através da API cel_cash. Cobranças com o seu CPF ou CNPJ, sem carteira de cobrança e sem burocracia, com confirmação de pagamento e baixa automática das faturas. Desenvolvido pela Gofas Software.
 
@@ -84,7 +84,7 @@ Crie um campo personalizado de cliente para CPF e/ou CNPJ, ou dois campos distin
 
 ## Suporte
 
-Fórum de suporte gratuito: https://gofas.net/foruns/
+[Abrir issue](https://gofas.net/?p=14687/#new-post) no fórum do módulo.
 
 ## Licença
 
